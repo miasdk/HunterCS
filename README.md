@@ -17,7 +17,7 @@ This repository covers topics from **CSCI 335: Software Design and Analysis III*
 
 ---
 
-## 🚀 **Getting Started**
+## **Getting Started**
 To use this repository, follow these steps:
 
 1. **Clone the Repository**:
