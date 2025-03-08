@@ -24,3 +24,13 @@ To use this repository, follow these steps:
    ```bash
    git clone https://github.com/your-username/CSCI335-DSA-Exam-Prep.git
    cd CSCI335-DSA-Exam-Prep
+.
+
+* * * * *
+
+**Acknowledgments**
+----------------------
+
+-   **Instructor**: Justin Tojeira, CUNY Hunter College.
+-   **Textbook**: *Data Structures and Algorithm Analysis in C++* by Mark Allen Weiss.
+
