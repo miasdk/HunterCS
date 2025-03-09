@@ -18,17 +18,6 @@ This repository covers topics from **CSCI 335: Software Design and Analysis III*
 
 ---
 
-## **Getting Started**
-To use this repository, follow these steps:
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/your-username/CSCI335-DSA.git
-   cd CSCI335-DSA
-.
-
-* * * * *
-
 **Acknowledgments**
 ----------------------
 
