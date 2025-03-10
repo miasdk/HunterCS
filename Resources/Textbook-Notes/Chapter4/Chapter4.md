@@ -35,7 +35,7 @@ Tree traversal refers to visiting all nodes of a tree systematically. There are 
    / \
   B   C
  / \   \
-D   E   F
+ D   E   F
 
 ### **1. Inorder Traversal (Left, Root, Right)**
 - Visit the **left subtree**.
@@ -130,6 +130,8 @@ An **AVL tree** is a **self-balancing BST**, where the height of two child subtr
 | **Search** | **O(log N)** |
 | **Insert** | **O(log N)** |
 | **Delete** | **O(log N)** |
+
+
 
 ### **Insertion & Deletion in AVL Trees**
 1. **Perform BST insertion/deletion**.
