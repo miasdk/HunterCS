@@ -37,7 +37,7 @@ Tree traversal refers to visiting all nodes of a tree systematically. There are 
  / \   \
 D   E   F
 
-### **1. Inorder Traversal (Left, Root, Right)**
+ ### **1. Inorder Traversal (Left, Root, Right)**
 - Visit the **left subtree**.
 - Visit the **root**.
 - Visit the **right subtree**.
