@@ -31,11 +31,12 @@ Tree traversal refers to visiting all nodes of a tree systematically. There are 
 
 ### **Example Tree**
 
-    A
+`    A
    / \
   B   C
  / \   \
 D   E   F
+`
 
  ### **1. Inorder Traversal (Left, Root, Right)**
 - Visit the **left subtree**.
