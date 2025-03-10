@@ -1,0 +1,1 @@
+Insert 10 into this AVL tree (add it on the diagram), then rebalance if necessary. List all nodes checked for balance in the order they're checked. If rebalancing is necessary, state which node must be rebalanced and what type of rotation must be used. Then draw the entire tree after rebalancing. 
