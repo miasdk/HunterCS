@@ -30,14 +30,14 @@ A **binary tree** is a tree where each node has **at most two children**.
 Tree traversal refers to visiting all nodes of a tree systematically. There are three common types:
 
 ### **Example Tree**
-
     A
    / \
   B   C
  / \   \
  D   E   F
 
-### **1. Inorder Traversal (Left, Root, Right)**
+
+ ### **1. Inorder Traversal (Left, Root, Right)**
 - Visit the **left subtree**.
 - Visit the **root**.
 - Visit the **right subtree**.
