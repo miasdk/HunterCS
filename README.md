@@ -1,4 +1,4 @@
-# CSCI335 Software Analysis & Design III - DSA 
+# CSCI335 DSA 
 
 ![GitHub](https://img.shields.io/badge/Language-C++-blue) 
 ![GitHub](https://img.shields.io/badge/Status-Active-brightgreen)
