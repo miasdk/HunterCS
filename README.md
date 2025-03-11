@@ -1,4 +1,4 @@
-# CSCI335 Data Structures & Algorithms V.1 Spring 2025
+# CSCI335 Software Analysis and Design III - DSA 
 
 ![GitHub](https://img.shields.io/badge/Language-C++-blue) 
 ![GitHub](https://img.shields.io/badge/Status-Active-brightgreen)
