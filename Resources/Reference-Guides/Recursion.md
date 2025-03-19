@@ -79,3 +79,13 @@ class MergeSort {
 }
 
 The algorithm continually splits the array in half; left to mid is one half, while mid + 1 to right is the other half. This splitting continues until each sub-array has a single element. In an array with a length of one, left and right will have the same value, which means left is no longer less than right. These sublists are then merged together, in a recursive manner, to produce a sorted list.
+
+//Simple recursive call to add numbers from 0 to n 
+
+`int findSum(int n) {
+    if (n == 0)
+        return 0; 
+    else 
+        return n + findSum(n-1); 
+}
+
