@@ -199,5 +199,3 @@ A **B-tree** is a **balanced M-way tree**, optimized for **disk storage and larg
    - **Borrow a key from a sibling**, or
    - **Merge with a sibling**.
 
-
-merge two sorted vectors of strings into a single new vector using move semantics and iterators. 
