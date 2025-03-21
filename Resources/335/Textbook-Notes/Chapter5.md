@@ -131,8 +131,8 @@ bool insert(const HashedObj & x) {
 
 2.  **Quadratic Probing**:
 
-    -   The collision function is quadratic.
-
+    -   The collision function is quadratic. The popular choice is f (i) = i^2
+      
 3.  **Double Hashing**:
 
     -   A second hash function is used to calculate the step size for probing.
