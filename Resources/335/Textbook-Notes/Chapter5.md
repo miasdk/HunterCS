@@ -43,7 +43,8 @@ Chapter 5: Hashing
     -   **Insert**: Check the appropriate list to see if the element is already present. If not, insert it at the front of the list (since recently inserted elements are likely to be accessed soon).
 
 -   **Hash Function Object Template**:
-template<typename Key>
+-   
+`template<typename Key>
 class hash {
 public:
     size_t operator() (const Key & k) const;
@@ -59,7 +60,7 @@ public:
             hashVal = 37 * hashVal + ch; // 37 is arbitrary
         return hashVal;
     }
-};
+};`
 -   **General Rule**: For separate chaining, the table size should be about as large as the number of elements expected (i.e., let **λ ≈ 1**).
 
 -   **Load Factor**: A measure of how full the hash table is.
