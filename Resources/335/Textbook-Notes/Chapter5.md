@@ -71,9 +71,8 @@ Chapter 5: Hashing
 * * * * *
 
 ### Additional Methods for Separate Chaining Hash Table
-`
 
-// makeEmpty()
+`// makeEmpty()
 void makeEmpty() {
     for (auto & thisList : theLists)
         thisList.clear();
@@ -111,8 +110,7 @@ bool insert(const HashedObj & x) {
         rehash();
 
     return true;
-}
-`
+}`
 * * * * *
 
 5.4 Hash Tables Without Linked Lists
