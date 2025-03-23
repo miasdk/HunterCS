@@ -43,25 +43,24 @@ Chapter 5: Hashing
     -   **Insert**: Check the appropriate list to see if the element is already present. If not, insert it at the front of the list (since recently inserted elements are likely to be accessed soon).
 
 -   **Hash Function Object Template**:
-`
-    template<typename Key>
-    class hash {
-    public:
-        size_t operator() (const Key & k) const;
-    };
+-   
+`template<typename Key>
+class hash {
+public:
+    size_t operator() (const Key & k) const;
+};
 
-    // Example implementation
-    template <>
-    class hash<string> {
-    public:
-        size_t operator()(const string & key) {
-            size_t hashVal = 0;
-            for (char ch : key)
-                hashVal = 37 * hashVal + ch; // 37 is arbitrary
-            return hashVal;
-        }
-    };
-`
+// Example implementation
+template <>
+class hash<string> {
+public:
+    size_t operator()(const string & key) {
+        size_t hashVal = 0;
+        for (char ch : key)
+            hashVal = 37 * hashVal + ch; // 37 is arbitrary
+        return hashVal;
+    }
+};`
 -   **General Rule**: For separate chaining, the table size should be about as large as the number of elements expected (i.e., let **λ ≈ 1**).
 
 -   **Load Factor**: A measure of how full the hash table is.
@@ -71,9 +70,8 @@ Chapter 5: Hashing
 * * * * *
 
 ### Additional Methods for Separate Chaining Hash Table
-`
 
-// makeEmpty()
+`// makeEmpty()
 void makeEmpty() {
     for (auto & thisList : theLists)
         thisList.clear();
@@ -111,8 +109,7 @@ bool insert(const HashedObj & x) {
         rehash();
 
     return true;
-}
-`
+}`
 * * * * *
 
 5.4 Hash Tables Without Linked Lists
@@ -134,8 +131,8 @@ bool insert(const HashedObj & x) {
 
 2.  **Quadratic Probing**:
 
-    -   The collision function is quadratic.
-
+    -   The collision function is quadratic. The popular choice is f (i) = i^2
+      
 3.  **Double Hashing**:
 
     -   A second hash function is used to calculate the step size for probing.
