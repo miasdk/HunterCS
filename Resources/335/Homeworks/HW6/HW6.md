@@ -18,3 +18,9 @@ c. a binary tree that has a deepest node at depth 4.1 log N
 
 d. the worst-case binary tree
 
+6.5 Rewrite the BinaryHeap insert routine by placing a copy of the inserted item in position 0
+
+6.6 How many nodes are in the large heap in Figure 6.13?
+
+6.7 a. Prove that for binary heaps, buildHeap does at most 2N−2 comparisons between
+elements.
