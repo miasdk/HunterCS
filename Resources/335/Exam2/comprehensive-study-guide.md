@@ -243,6 +243,16 @@ struct AvlNode {
 
 ## C++ STL Implementation
 
+-
+### Question:
+**5) Write the data structure used to implement each of the following STL containers.**
+
+### Answer:
+- **Set**: Self-balancing binary search tree (typically a Red-Black Tree).
+- **Unordered Map**: Hash table.
+- **Multimap**: Self-balancing binary search tree (typically a Red-Black Tree).
+- **Priority Queue**: Binary heap.
+
 ### Container Types
 
 #### Sequence Containers
