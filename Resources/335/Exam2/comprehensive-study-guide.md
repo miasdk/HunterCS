@@ -122,6 +122,30 @@ I'll now add this question and answer to your study guide.The question about why
   - Time Complexity: O(n + k log k) where k is number of unique values
 
 ## Heap Operations
+### Answer:
+In a min heap, every parent node is smaller than or equal to its children. Given that the heap has a height of 4 and the lowest level is full (31 nodes in total), the maximum number of elements that can be greater than the value `X` (a leaf node) is **15**.
+
+---
+
+### Explanation:
+1. **Structure of the Min Heap**:
+   - A min heap is a complete binary tree, meaning all levels are fully filled except possibly the last, which is filled from left to right.
+   - The total number of nodes for height 4 (lowest level full) is `31`. These consist of:
+     - Level 0 (root): 1 node
+     - Level 1: 2 nodes
+     - Level 2: 4 nodes
+     - Level 3: 8 nodes
+     - Level 4 (leaves): 16 nodes
+
+2. **Leaf Node Properties**:
+   - Leaf nodes do not have children, so their value is not compared further.
+   - The value `X` is one of the 16 leaf node values.
+
+3. **Elements Greater Than `X`**:
+   - Since `X` is at the lowest level, the maximum number of elements that can be greater than `X` are the internal nodes (non-leaf nodes) of the heap.
+   - Total non-leaf nodes = Total nodes - Leaf nodes = `31 - 16 = 15`.
+
+Therefore, the **maximum number of elements greater than `X` is 15**.
 
 ### Binary Heap Structure
 - Complete binary tree with heap-order property
