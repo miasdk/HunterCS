@@ -159,6 +159,33 @@ Based on previous exams, homework assignments, and additional materials, here's 
 - Event-driven simulation
 - Kth largest/smallest element
 
+### AVL Tree Operations
+
+#### Question:
+4) Write the `findMin` function for an AVL tree. `AvlNode` is provided for reference.
+
+#### Answer:
+The `findMin` function traverses the left subtree recursively to locate the node with the smallest element in the AVL tree.
+
+```cpp
+struct AvlNode {
+    Comparable element;
+    AvlNode* left;
+    AvlNode* right;
+    int height;
+
+    // Function to find the minimum element in the AVL tree
+    AvlNode* findMin(AvlNode* t) const {
+        if (t == nullptr) {
+            return nullptr; // Tree is empty
+        } else if (t->left == nullptr) {
+            return t; // Found the minimum element
+        } else {
+            return findMin(t->left); // Recur down the left subtree
+        }
+    }
+};
+
 ## Hash Tables
 
 ### Hash Function Design
