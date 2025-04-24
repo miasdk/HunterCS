@@ -13,10 +13,7 @@ int main ()
   std::pair<std::string,double> myshopping ("baking powder",0.3);
 
   myrecipe.insert (myshopping);                        // copy insertion
-  myrecipe.insert (std::make_pair<std::string,double>("eggs",6.0)); // move insertion
-  myrecipe.insert (mypantry.begin(), mypantry.end());  // range insertion
-  myrecipe.insert ( {{"sugar",0.8},{"salt",0.1}} );    // initializer list insertion
-
+  myrecipe.insert(std::make_pair("sugar",1.0));            // move insertion
   std::cout << "myrecipe contains:" << std::endl;
   for (auto& x: myrecipe)
     std::cout << x.first << ": " << x.second << std::endl;
