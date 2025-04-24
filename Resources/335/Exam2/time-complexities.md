@@ -67,7 +67,6 @@
 | Algorithm | Average Case | Worst Case | Space Complexity |
 |-----------|--------------|------------|------------------|
 | Hoare Partition | O(n) | O(n) | O(1) |
-| Lomuto Partition | O(n) | O(n) | O(1) |
 
 ## 6. Graph Algorithms
 
