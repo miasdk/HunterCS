@@ -162,6 +162,63 @@ I'll now add this question and answer to your study guide.The question about why
   3. Percolate down (compare with children, swap with smallest/largest)
   4. Repeat until heap property restored
 
+Let’s walk through the process of the `deleteMin` operation on the given min heap step by step:
+
+---
+
+### Initial Array (Heap Representation):
+```text
+[3, 4, 6, 8, 13, 7, 11, 10]
+```
+
+---
+
+### Steps of `deleteMin` Operation:
+
+1. **Remove Minimum Element (Root):**
+   - The minimum element, `3`, is removed from the root.
+   - Replace the root with the last element in the heap (`10`).
+
+   **Heap After Step 1:**
+   ```text
+   [10, 4, 6, 8, 13, 7, 11, -]
+   ```
+
+2. **Percolate Down (First Swap):**
+   - Compare `10` (root) with its children: `4` and `6`.
+   - Swap `10` with the smaller child (`4`).
+
+   **Heap After Step 2:**
+   ```text
+   [4, 10, 6, 8, 13, 7, 11, -]
+   ```
+
+3. **Percolate Down (Second Swap):**
+   - Compare `10` with its children: `8` and `7`.
+   - Swap `10` with the smaller child (`7`).
+
+   **Heap After Step 3:**
+   ```text
+   [4, 7, 6, 8, 13, 10, 11, -]
+   ```
+
+4. **Heap Property Restored:**
+   - No further swaps are needed as `10` is now greater than its children.
+
+   **Final Heap:**
+   ```text
+   [4, 7, 6, 8, 13, 10, 11, -]
+   ```
+
+---
+
+### Explanation of the Process:
+- The `deleteMin` operation works by removing the minimum element at the root.
+- The last element in the heap is moved to the root to maintain the complete binary tree property.
+- The heap is then adjusted (percolated down) to restore the min-heap property by swapping the root with the smaller child until the heap property is satisfied.
+
+Would you like me to include this explanation and result in your study guide?
+
 - **BuildHeap**: O(n)
   1. Start with unsorted array
   2. Starting from last non-leaf node, percolate down each node
