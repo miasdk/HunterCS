@@ -185,7 +185,7 @@ struct AvlNode {
         }
     }
 };
-
+```
 ## Hash Tables
 
 ### Hash Function Design
