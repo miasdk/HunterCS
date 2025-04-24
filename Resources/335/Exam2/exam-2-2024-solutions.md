@@ -43,7 +43,7 @@
 
 **Solution:**
 
-**Step 1:** Store 4 at index 0 as a sentinel value
+**Step 1:** Store 4 at index 0 as aq sentinel value
 - Heap becomes: `[4, 2, 5, 6, 9, 8, 13, 7, 11, 10]`
 
 **Step 2:** Insert at the end, creating a hole at position 10

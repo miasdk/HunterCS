@@ -1,6 +1,6 @@
-# CSCI 335 Comprehensive Exam 2 Study Guide
+# CSCI 335 Comprehensive Exam 2 Revised Study Guide
 
-This guide combines insights from Homework 5, 6, 7, and previous exam patterns to create a complete preparation resource for your upcoming exam.
+This guide combines insights from Homework 5, 6, 7, previous exam patterns, and additional materials on C++ STL, sorting algorithms, and data structures to create a complete preparation resource for your upcoming exam.
 
 ## Table of Contents
 1. [Topic Distribution & Focus Areas](#topic-distribution--focus-areas)
@@ -14,14 +14,14 @@ This guide combines insights from Homework 5, 6, 7, and previous exam patterns t
 
 ## Topic Distribution & Focus Areas
 
-Based on previous exams and homework assignments, here's the recommended focus distribution:
+Based on previous exams, homework assignments, and additional materials, here's the recommended focus distribution:
 
 | Topic | Percentage | Key Focus Areas |
 |-------|------------|----------------|
-| **Heap Operations** | 33% | Insertion, deleteMin, buildHeap, complexity analysis |
+| **Heap Operations** | 30% | Insertion, deleteMin, buildHeap, complexity analysis |
 | **Sorting Algorithms** | 25% | Quicksort, Heapsort, Mergesort, Introsort |
-| **Hash Tables** | 20% | Quadratic probing, load factors, collision resolution |
-| **STL Implementation** | 22% | Time complexities, hash maps, container usage |
+| **Hash Tables** | 25% | Quadratic probing, load factors, collision resolution |
+| **STL Implementation** | 20% | Time complexities, hash maps, container usage |
 
 ## Sorting Algorithms
 
@@ -42,6 +42,9 @@ Based on previous exams and homework assignments, here's the recommended focus d
   - Random element (robust)
   - Median-of-three (first, middle, last)
 - **Optimization**: Use insertion sort for small partitions (cutoff)
+- **Important Detail**: How to handle elements equal to pivot impacts performance
+  - If both pointers stop at elements equal to pivot: better even partitioning
+  - If no pointers stop: risk of uneven partitioning
 
 ### Heapsort
 - **Algorithm**:
@@ -71,6 +74,9 @@ Based on previous exams and homework assignments, here's the recommended focus d
   - Stable sort (preserves order of equal elements)
   - Good for linked lists
   - Predictable performance regardless of input
+- **Analysis**: 
+  - T(n) = 2T(n/2) + n
+  - For n = 2^k: T(n) = n log n
 
 ### Introsort
 - **Algorithm**: Hybrid of quicksort, heapsort, and insertion sort
@@ -83,6 +89,18 @@ Based on previous exams and homework assignments, here's the recommended focus d
   - Good average-case performance
   - Guaranteed worst-case performance
   - Practical for both random and pathological inputs
+- **Used in**: C++ STL's std::sort implementation
+
+### Linear-Time Sorting Algorithms
+- **Counting Sort**
+  - Sorts a collection of objects with small positive integer keys
+  - Time Complexity: O(n+k) where k is number of keys
+  - Useful for data with known range of consecutive integers
+  - Limited by range of keys (requires O(k) extra space)
+- **Hash-Based Variant**
+  - Can handle non-consecutive integers
+  - Uses hash map to count occurrences
+  - Time Complexity: O(n + k log k) where k is number of unique values
 
 ## Heap Operations
 
@@ -191,14 +209,46 @@ Based on previous exams and homework assignments, here's the recommended focus d
 - Use separate chaining
 - Default max load factor: 1.0
 - Automatic rehashing when load factor exceeds max
+- Limitations compared to ordered containers:
+  - Cannot efficiently perform range queries
+  - Cannot maintain sorted order
+  - Cannot perform operations like findMin, findMax efficiently
 
 ## C++ STL Implementation
 
-### Common Containers
-- `vector`: Dynamic array (O(1) access)
-- `list`: Doubly linked list (O(1) insert/remove with iterator)
-- `map`/`set`: Red-black tree (O(log n) operations)
-- `unordered_map`/`unordered_set`: Hash table (O(1) average operations)
+### Container Types
+
+#### Sequence Containers
+- **Arrays**: Fixed-size, contiguous memory, random access
+- **Vectors**: Dynamically allocated arrays
+  - O(1) access and amortized append
+  - O(n) insertion/deletion in middle
+- **Forward Lists**: Singly-linked lists
+- **Lists**: Doubly-linked lists
+  - O(1) insertion/removal with iterator
+- **Deques**: Double-ended queues
+  - Multiple blocks in memory
+  - Efficient insertion/deletion at both ends
+
+#### Container Adaptors
+- **Stack**: LIFO, uses deque by default
+- **Queue**: FIFO, uses deque by default
+- **Priority Queue**: Heap implementation, uses vector by default
+
+#### Associative Containers
+- Self-balancing binary search trees (typically red-black trees)
+- **Set/Multiset**: Collection of unique/non-unique elements
+- **Map/Multimap**: Key-value pairs
+- O(log n) operations
+- Ordered traversal
+- Support range queries
+
+#### Unordered Associative Containers
+- Hash-based implementations
+- **unordered_set/unordered_multiset**: Hash table of elements
+- **unordered_map/unordered_multimap**: Hash map of key-value pairs
+- O(1) average operations, O(n) worst-case
+- No ordered traversal
 
 ### Time Complexities
 - **vector**:
@@ -206,7 +256,14 @@ Based on previous exams and homework assignments, here's the recommended focus d
   - Insert/remove at end: O(1) amortized
   - Insert/remove elsewhere: O(n)
 
-- **unordered_map**:
+- **list**:
+  - Access: O(n)
+  - Insert/remove with iterator: O(1)
+
+- **map/set**:
+  - All operations: O(log n)
+
+- **unordered_map/unordered_set**:
   - Insert/find/erase key: O(1) average, O(n) worst
   - Find value: O(n)
 
@@ -247,26 +304,56 @@ void findMode(vector<int>& nums) {
 
 ## Practice Problems
 
-### Problem 1: Hoare Partitioning
-Partition the array [5, 9, 3, 7, 2, 8, 1, 6] using Hoare partitioning with pivot 5.
+### Median-of-Three Pivot Selection
 
-<details>
-<summary>Solution</summary>
+The median-of-three pivot selection strategy is an important optimization for quicksort that helps avoid worst-case behavior, particularly for sorted or nearly-sorted inputs.
 
-1. Swap pivot with last element: [6, 9, 3, 7, 2, 8, 1, 5]
-2. Initialize i=0, j=6
-3. Find element ≥ 5 from left: 6 at index 0
-4. Find element ≤ 5 from right: 1 at index 6
-5. Swap: [1, 9, 3, 7, 2, 8, 6, 5]
-6. i=1, j=5
-7. Find element ≥ 5 from left: 9 at index 1
-8. Find element ≤ 5 from right: 2 at index 4
-9. Swap: [1, 2, 3, 7, 9, 8, 6, 5]
-10. i=3, j=3
-11. Since i=j, partition complete
-12. Swap pivot with element at position j: [1, 2, 3, 5, 9, 8, 6, 7]
-13. Final partitioned array: [1, 2, 3, 5, 9, 8, 6, 7]
-</details>
+**Algorithm**:
+1. Select three elements from the array:
+   - Leftmost element (at index `left`)
+   - Middle element (at index `left + (right - left) / 2`)
+   - Rightmost element (at index `right`)
+   
+2. Sort these three elements (can be done with simple comparisons)
+
+3. Use the median (middle value) as the pivot
+
+4. Place the pivot at a known position (often swapped with the rightmost element)
+
+**Example**:
+For array [5, 9, 3, 7, 2, 8, 1, 6]:
+- Leftmost: 5 (index 0)
+- Middle: 7 (index 3, calculated as 0 + (7-0)/2)
+- Rightmost: 6 (index 7)
+
+Sorting these three elements (5, 7, 6) gives (5, 6, 7), with median 6.
+
+**Implementation**:
+```cpp
+// Median-of-three pivot selection
+int medianOfThree(vector<int>& arr, int left, int right) {
+    int mid = left + (right - left) / 2;
+    
+    // Sort the three elements
+    if (arr[left] > arr[mid])
+        swap(arr[left], arr[mid]);
+    if (arr[left] > arr[right])
+        swap(arr[left], arr[right]);
+    if (arr[mid] > arr[right])
+        swap(arr[mid], arr[right]);
+    
+    // The median is now at mid
+    // Typically we swap it to right-1 for partitioning
+    swap(arr[mid], arr[right-1]);
+    return arr[right-1]; // Return pivot value
+}
+```
+
+**Benefits**:
+- Significantly reduces the chance of worst-case O(n²) behavior
+- Works well for sorted, reverse-sorted, and partially sorted arrays
+- Minimal overhead (only requires a few comparisons)
+- Particularly valuable for large arrays
 
 ### Problem 2: Heap Insertion
 Insert 3 into the min heap [5, 8, 6, 9, 12, 11, 7, 10].
@@ -330,6 +417,13 @@ void mystery(vector<int>& nums) {
 3. Total complexity: O(n log n)
 </details>
 
+### Problem 5: Decision Trees and Sorting Lower Bounds
+- Any comparison-based sorting algorithm requires Ω(n log n) comparisons in the worst case
+- Proof uses decision trees:
+  - A decision tree with L leaves must have depth of at least ceil(log L)
+  - A sorting algorithm for n elements must distinguish between n! different permutations
+  - Therefore, depth must be at least ceil(log(n!)) ≈ Ω(n log n)
+
 ## Key Time Complexities to Memorize
 
 ### Sorting Algorithms
@@ -338,6 +432,7 @@ void mystery(vector<int>& nums) {
 - Mergesort: O(n log n) always
 - Quicksort: O(n log n) average, O(n²) worst
 - Introsort: O(n log n) worst case
+- Counting Sort: O(n+k) where k is range of keys
 
 ### Heap Operations
 - BuildHeap: O(n) (not O(n log n))
@@ -345,18 +440,27 @@ void mystery(vector<int>& nums) {
 - DeleteMin/DeleteMax: O(log n)
 - FindMin/FindMax: O(1)
 - Find Min in Max Heap: O(n)
+- Heapsort: O(n log n)
 
 ### Hash Table Operations
 - Insert/Delete/Find: O(1) average, O(n) worst
 - Rehashing: O(n)
 - Find value (not key): O(n)
 
-### STL Operations
-- Rehashing (average case): O(n)
-- Find key in unordered_map: O(1) average
-- Find key in ordered map: O(log n)
-- Partition around pivot: O(n)
-- Quickselect (average): O(n)
+### STL Container Operations
+| Container      | Access | Insert/Delete (begin/end) | Insert/Delete (middle) | Find  |
+|----------------|--------|---------------------------|------------------------|-------|
+| vector         | O(1)   | O(1) amortized at end     | O(n)                   | O(n)  |
+| list           | O(n)   | O(1)                      | O(1) with iterator     | O(n)  |
+| deque          | O(1)   | O(1) amortized            | O(n)                   | O(n)  |
+| map/set        | O(log n)| O(log n)                  | O(log n)               | O(log n) |
+| unordered_map/set | O(1) avg | O(1) avg               | O(1) avg with iterator | O(1) avg |
+| priority_queue | O(1) for top | O(log n) push/pop     | n/a                    | n/a  |
+
+### QuickSelect
+- O(n) average case
+- O(n²) worst case
+- Used for finding kth smallest/largest element
 
 ## Exam Preparation Strategy
 
