@@ -91,6 +91,25 @@ Based on previous exams, homework assignments, and additional materials, here's 
   - Practical for both random and pathological inputs
 - **Used in**: C++ STL's std::sort implementation
 
+Insertion sort is good for small inputs despite being \( O(n^2) \) because:
+
+1. **Low Overhead**: It has minimal overhead compared to more complex algorithms, making it faster for small datasets.
+2. **Nearly Sorted Data**: It performs exceptionally well on nearly sorted data, achieving \( O(n) \) time complexity in such cases.
+
+I'll now add this question and answer to your study guide.The question about why insertion sort is good for small inputs is not currently present in the study guide. I will add the following question and answer under the **Sorting Algorithms** section:
+
+---
+
+### Question:
+**10) Give 2 reasons why insertion sort is good for small inputs despite being an \(O(n^2)\) sort.**
+
+### Answer:
+1. **Low Overhead**: Insertion sort has minimal setup and memory overhead, making it efficient for small datasets where the quadratic time complexity is not a significant factor.
+2. **Adaptive Nature**: It performs well on nearly sorted or small datasets, as its best-case time complexity is \(O(n)\), making it a good choice for small partitions or inputs.
+
+---
+
+
 ### Linear-Time Sorting Algorithms
 - **Counting Sort**
   - Sorts a collection of objects with small positive integer keys
