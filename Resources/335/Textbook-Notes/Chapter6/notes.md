@@ -1,6 +1,6 @@
 # Binary Heaps & Priority Queues: A Learning Guide
 
-## 1. Priority Queue Fundamentals
+## 1. Priority Queues (Heaps)
 
 ### 1.1 What is a Priority Queue?
 A priority queue is an abstract data type (ADT) that allows at least the following operations:
