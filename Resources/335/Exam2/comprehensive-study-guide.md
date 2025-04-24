@@ -263,7 +263,79 @@ struct AvlNode {
 };
 ```
 ## Hash Tables
+### Given:
+1. **Hash Functions**:  
+   - `h(x) = x mod 11`  
+   - `h2(x) = 8 - (x mod 8)`  
+2. **Keys to Insert**: `30`, `12`, `27`, `16`
+3. **Table Size**: `11`
 
+---
+
+### Step-by-Step Process:
+
+#### Insert `30`:
+- `h(30) = 30 mod 11 = 8`
+- `h2(30) = 8 - (30 mod 8) = 8 - 6 = 2`
+- Index `8` is empty, so place `30` at index `8`.
+
+**Hash Table After Insert 30**:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: -  -  -  -  -  -  -  - 30  -  -
+```
+
+---
+
+#### Insert `12`:
+- `h(12) = 12 mod 11 = 1`
+- `h2(12) = 8 - (12 mod 8) = 8 - 4 = 4`
+- Index `1` is empty, so place `12` at index `1`.
+
+**Hash Table After Insert 12**:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: - 12  -  -  -  -  -  - 30  -  -
+```
+
+---
+
+#### Insert `27`:
+- `h(27) = 27 mod 11 = 5`
+- `h2(27) = 8 - (27 mod 8) = 8 - 3 = 5`
+- Index `5` is empty, so place `27` at index `5`.
+
+**Hash Table After Insert 27**:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: - 12  -  -  - 27  -  - 30  -  -
+```
+
+---
+
+#### Insert `16`:
+- `h(16) = 16 mod 11 = 5`
+- Index `5` is already occupied by `27`. Use `h2(16)` to find the next index:
+  - `h2(16) = 8 - (16 mod 8) = 8 - 0 = 8`
+  - Probe sequence: `(5 + i * 8) mod 11`  
+    - For `i = 1`: `(5 + 1 * 8) mod 11 = 13 mod 11 = 2`
+- Index `2` is empty, so place `16` at index `2`.
+
+**Hash Table After Insert 16**:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: - 12 16  -  - 27  -  - 30  -  -
+```
+
+---
+
+### Final Hash Table:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: - 12 16  -  - 27  -  - 30  -  -
+```
+
+Would you like me to include this in your study guide under a specific section?
 ### Hash Function Design
 - **Properties of Good Hash Functions**:
   - Distributes keys uniformly
