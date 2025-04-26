@@ -91,6 +91,25 @@ Based on previous exams, homework assignments, and additional materials, here's 
   - Practical for both random and pathological inputs
 - **Used in**: C++ STL's std::sort implementation
 
+Insertion sort is good for small inputs despite being \( O(n^2) \) because:
+
+1. **Low Overhead**: It has minimal overhead compared to more complex algorithms, making it faster for small datasets.
+2. **Nearly Sorted Data**: It performs exceptionally well on nearly sorted data, achieving \( O(n) \) time complexity in such cases.
+
+I'll now add this question and answer to your study guide.The question about why insertion sort is good for small inputs is not currently present in the study guide. I will add the following question and answer under the **Sorting Algorithms** section:
+
+---
+
+### Question:
+**10) Give 2 reasons why insertion sort is good for small inputs despite being an \(O(n^2)\) sort.**
+
+### Answer:
+1. **Low Overhead**: Insertion sort has minimal setup and memory overhead, making it efficient for small datasets where the quadratic time complexity is not a significant factor.
+2. **Adaptive Nature**: It performs well on nearly sorted or small datasets, as its best-case time complexity is \(O(n)\), making it a good choice for small partitions or inputs.
+
+---
+
+
 ### Linear-Time Sorting Algorithms
 - **Counting Sort**
   - Sorts a collection of objects with small positive integer keys
@@ -103,6 +122,30 @@ Based on previous exams, homework assignments, and additional materials, here's 
   - Time Complexity: O(n + k log k) where k is number of unique values
 
 ## Heap Operations
+### Answer:
+In a min heap, every parent node is smaller than or equal to its children. Given that the heap has a height of 4 and the lowest level is full (31 nodes in total), the maximum number of elements that can be greater than the value `X` (a leaf node) is **15**.
+
+---
+
+### Explanation:
+1. **Structure of the Min Heap**:
+   - A min heap is a complete binary tree, meaning all levels are fully filled except possibly the last, which is filled from left to right.
+   - The total number of nodes for height 4 (lowest level full) is `31`. These consist of:
+     - Level 0 (root): 1 node
+     - Level 1: 2 nodes
+     - Level 2: 4 nodes
+     - Level 3: 8 nodes
+     - Level 4 (leaves): 16 nodes
+
+2. **Leaf Node Properties**:
+   - Leaf nodes do not have children, so their value is not compared further.
+   - The value `X` is one of the 16 leaf node values.
+
+3. **Elements Greater Than `X`**:
+   - Since `X` is at the lowest level, the maximum number of elements that can be greater than `X` are the internal nodes (non-leaf nodes) of the heap.
+   - Total non-leaf nodes = Total nodes - Leaf nodes = `31 - 16 = 15`.
+
+Therefore, the **maximum number of elements greater than `X` is 15**.
 
 ### Binary Heap Structure
 - Complete binary tree with heap-order property
@@ -143,6 +186,63 @@ Based on previous exams, homework assignments, and additional materials, here's 
   3. Percolate down (compare with children, swap with smallest/largest)
   4. Repeat until heap property restored
 
+Let’s walk through the process of the `deleteMin` operation on the given min heap step by step:
+
+---
+
+### Initial Array (Heap Representation):
+```text
+[3, 4, 6, 8, 13, 7, 11, 10]
+```
+
+---
+
+### Steps of `deleteMin` Operation:
+
+1. **Remove Minimum Element (Root):**
+   - The minimum element, `3`, is removed from the root.
+   - Replace the root with the last element in the heap (`10`).
+
+   **Heap After Step 1:**
+   ```text
+   [10, 4, 6, 8, 13, 7, 11, -]
+   ```
+
+2. **Percolate Down (First Swap):**
+   - Compare `10` (root) with its children: `4` and `6`.
+   - Swap `10` with the smaller child (`4`).
+
+   **Heap After Step 2:**
+   ```text
+   [4, 10, 6, 8, 13, 7, 11, -]
+   ```
+
+3. **Percolate Down (Second Swap):**
+   - Compare `10` with its children: `8` and `7`.
+   - Swap `10` with the smaller child (`7`).
+
+   **Heap After Step 3:**
+   ```text
+   [4, 7, 6, 8, 13, 10, 11, -]
+   ```
+
+4. **Heap Property Restored:**
+   - No further swaps are needed as `10` is now greater than its children.
+
+   **Final Heap:**
+   ```text
+   [4, 7, 6, 8, 13, 10, 11, -]
+   ```
+
+---
+
+### Explanation of the Process:
+- The `deleteMin` operation works by removing the minimum element at the root.
+- The last element in the heap is moved to the root to maintain the complete binary tree property.
+- The heap is then adjusted (percolated down) to restore the min-heap property by swapping the root with the smaller child until the heap property is satisfied.
+
+Would you like me to include this explanation and result in your study guide?
+
 - **BuildHeap**: O(n)
   1. Start with unsorted array
   2. Starting from last non-leaf node, percolate down each node
@@ -159,8 +259,107 @@ Based on previous exams, homework assignments, and additional materials, here's 
 - Event-driven simulation
 - Kth largest/smallest element
 
-## Hash Tables
+### AVL Tree Operations
 
+#### Question:
+4) Write the `findMin` function for an AVL tree. `AvlNode` is provided for reference.
+
+#### Answer:
+The `findMin` function traverses the left subtree recursively to locate the node with the smallest element in the AVL tree.
+
+```cpp
+struct AvlNode {
+    Comparable element;
+    AvlNode* left;
+    AvlNode* right;
+    int height;
+
+    // Function to find the minimum element in the AVL tree
+    AvlNode* findMin(AvlNode* t) const {
+        if (t == nullptr) {
+            return nullptr; // Tree is empty
+        } else if (t->left == nullptr) {
+            return t; // Found the minimum element
+        } else {
+            return findMin(t->left); // Recur down the left subtree
+        }
+    }
+};
+```
+## Hash Tables
+### Given:
+1. **Hash Functions**:  
+   - `h(x) = x mod 11`  
+   - `h2(x) = 8 - (x mod 8)`  
+2. **Keys to Insert**: `30`, `12`, `27`, `16`
+3. **Table Size**: `11`
+
+---
+
+### Step-by-Step Process:
+
+#### Insert `30`:
+- `h(30) = 30 mod 11 = 8`
+- `h2(30) = 8 - (30 mod 8) = 8 - 6 = 2`
+- Index `8` is empty, so place `30` at index `8`.
+
+**Hash Table After Insert 30**:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: -  -  -  -  -  -  -  - 30  -  -
+```
+
+---
+
+#### Insert `12`:
+- `h(12) = 12 mod 11 = 1`
+- `h2(12) = 8 - (12 mod 8) = 8 - 4 = 4`
+- Index `1` is empty, so place `12` at index `1`.
+
+**Hash Table After Insert 12**:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: - 12  -  -  -  -  -  - 30  -  -
+```
+
+---
+
+#### Insert `27`:
+- `h(27) = 27 mod 11 = 5`
+- `h2(27) = 8 - (27 mod 8) = 8 - 3 = 5`
+- Index `5` is empty, so place `27` at index `5`.
+
+**Hash Table After Insert 27**:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: - 12  -  -  - 27  -  - 30  -  -
+```
+
+---
+
+#### Insert `16`:
+- `h(16) = 16 mod 11 = 5`
+- Index `5` is already occupied by `27`. Use `h2(16)` to find the next index:
+  - `h2(16) = 8 - (16 mod 8) = 8 - 0 = 8`
+  - Probe sequence: `(5 + i * 8) mod 11`  
+    - For `i = 1`: `(5 + 1 * 8) mod 11 = 13 mod 11 = 2`
+- Index `2` is empty, so place `16` at index `2`.
+
+**Hash Table After Insert 16**:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: - 12 16  -  - 27  -  - 30  -  -
+```
+
+---
+
+### Final Hash Table:
+```
+Index: 0  1  2  3  4  5  6  7  8  9 10
+Value: - 12 16  -  - 27  -  - 30  -  -
+```
+
+Would you like me to include this in your study guide under a specific section?
 ### Hash Function Design
 - **Properties of Good Hash Functions**:
   - Distributes keys uniformly
@@ -215,6 +414,16 @@ Based on previous exams, homework assignments, and additional materials, here's 
   - Cannot perform operations like findMin, findMax efficiently
 
 ## C++ STL Implementation
+
+-
+### Question:
+**5) Write the data structure used to implement each of the following STL containers.**
+
+### Answer:
+- **Set**: Self-balancing binary search tree (typically a Red-Black Tree).
+- **Unordered Map**: Hash table.
+- **Multimap**: Self-balancing binary search tree (typically a Red-Black Tree).
+- **Priority Queue**: Binary heap.
 
 ### Container Types
 
