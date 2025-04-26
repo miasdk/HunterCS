@@ -462,6 +462,7 @@ void mystery(vector<int>& nums) {
 - O(n²) worst case
 - Used for finding kth smallest/largest element
 
+
 ## Exam Preparation Strategy
 
 ### Day Before Exam
