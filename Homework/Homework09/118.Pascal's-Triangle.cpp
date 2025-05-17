@@ -18,6 +18,7 @@ class Solution {
                 // Calculate middle elements using recurrence relation 
                 for (int j = 1; j < i; ++j) {
                     result[i][j] = result[i-1][j-1] + result[i-1][j];
+                }
 
             }
             return result;
