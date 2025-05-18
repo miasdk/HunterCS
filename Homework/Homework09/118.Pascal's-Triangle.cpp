@@ -11,7 +11,7 @@ class Solution {
                 // Each row has i+1 elements 
                 result[i].resize(i + 1);
 
-                // Ensure first and last elements of each roq are always 1
+                // Ensure first and last elements of each row are always 1
                 result[i][0] = 1;
                 result[i][i] = 1;
 
