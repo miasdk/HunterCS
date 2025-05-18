@@ -10,15 +10,7 @@ class Solution {
 
             // Base case: 0 requires 0 perfect squares 
             dp[0] = 0; 
-
-            // Fill the dp array from 1 to n 
-            for (int i = 1; i <= n; ++i) {
-                //
-            }
-
-            //Base case: 0 requires 0 perfect squares 
-            dp[0] = 0;
-
+            
             //Fill the dp array from 1 to n 
             for(int i = 1; i <= n; ++i){
                 //Trying all possible perfect squares less than or equal to i 
