@@ -1,76 +1,5 @@
 # Comprehensive DSA Final Exam Study Guide
 
-## Table of Contents
-- [Prioritized Study Plan](#prioritized-study-plan)
-- [Part 1: Critical Topics](#part-1-critical-topics)
-  - [Algorithm Design and Analysis](#1-algorithm-design-and-analysis-225-points)
-  - [AVL Trees](#2-avl-trees-06-points)
-  - [Heap Operations](#3-heap-operations-08-points---buildheap-and-percdown)
-  - [Hash Table Design and Operations](#4-hash-table-design-and-operations-255-points)
-  - [Kruskal's Algorithm](#5-kruskals-algorithm-06-points)
-  - [Nearest Neighbor Complexity Analysis](#6-nearest-neighbor-complexity-analysis-212-points)
-  - [Quickselect Implementation](#7-quickselect-implementation-610-points)
-- [Part 2: Important Topics](#part-2-important-topics-study-these-second)
-  - [Dijkstra's Algorithm](#1-dijkstras-algorithm-7512-points)
-  - [Prim's Algorithm Complexity](#2-prims-algorithm-complexity-4512-points)
-  - [Unordered Map Usage](#3-unordered-map-usage-320-points)
-- [Part 3: Review Topics](#part-3-review-topics-reinforce-your-knowledge)
-  - [Quicksort Partitioning](#1-quicksort-partitioning-1010-points)
-  - [DeleteMin from Heap](#2-deletemin-from-heap-810-points)
-  - [Priority Queues](#3-priority-queues-66-points)
-  - [Topological Ordering](#4-topological-ordering-33-points)
-  - [Time Complexity Analysis](#5-time-complexity-analysis-78-points)
-- [Part 4: Graph Algorithms](#part-4-graph-algorithms-chapter-9)
-  - [Graph Representations](#1-graph-representations)
-  - [Graph Traversals](#2-graph-traversals)
-  - [Single-Source Shortest Path](#3-single-source-shortest-path)
-  - [Minimum Spanning Trees](#4-minimum-spanning-trees)
-  - [Vertex Cover Problem](#5-vertex-cover-problem)
-- [Part 5: Greedy Algorithms and Dynamic Programming](#part-5-greedy-algorithms-and-dynamic-programming-chapter-10)
-  - [Greedy Algorithms](#1-greedy-algorithms)
-  - [Dynamic Programming](#2-dynamic-programming)
-- [Time Complexity Cheat Sheet](#time-complexity-cheat-sheet)
-- [Exam Preparation Strategy](#exam-preparation-strategy)
-  - [Week 1: Critical Topics](#week-1-critical-topics)
-  - [Week 2: Important Topics](#week-2-important-topics)
-  - [Week 3: Review Topics and Integration](#week-3-review-topics-and-integration)
-  - [Daily Practice Schedule](#daily-practice-schedule)
-- [Implementation Guidelines for Coding Questions](#implementation-guidelines-for-coding-questions)
-  - [General Coding Best Practices](#general-coding-best-practices)
-  - [Common C++ STL Containers](#common-c-stl-containers)
-  - [Iterating Through Containers](#iterating-through-containers)
-  - [Working with Pairs and Maps](#working-with-pairs-and-maps)
-- [Additional Insights from Course Homework](#additional-insights-from-course-homework)
-  - [From Homework 1-2: Fundamentals](#from-homework-1-2-fundamentals)
-  - [From Homework 3-4: Trees and Balanced Trees](#from-homework-3-4-trees-and-balanced-trees)
-  - [From Homework 5: Hashing](#from-homework-5-hashing)
-  - [From Homework 6: Heaps and Priority Queues](#from-homework-6-heaps-and-priority-queues)
-  - [From Homework 7: Sorting and Graph Algorithms](#from-homework-7-sorting-and-graph-algorithms)
-  - [From Homework 8: Dynamic Programming](#from-homework-8-dynamic-programming)
-- [Algorithm Analysis Techniques](#algorithm-analysis-techniques)
-  - [Asymptotic Analysis](#1-asymptotic-analysis)
-  - [Recurrence Relations](#2-recurrence-relations)
-  - [Amortized Analysis](#3-amortized-analysis)
-- [Detailed Analysis of Key Algorithms](#detailed-analysis-of-key-algorithms)
-  - [Sorting Algorithms](#1-sorting-algorithms)
-  - [Advanced Tree Operations](#2-advanced-tree-operations)
-  - [Graph Algorithm Analysis](#3-graph-algorithm-analysis)
-- [Study Plan Implementation](#study-plan-implementation)
-  - [Week 1: Focusing on Critical Topics](#week-1-focusing-on-critical-topics)
-  - [Week 2: Strengthening Important Topics](#week-2-strengthening-important-topics)
-  - [Week 3: Integration and Review](#week-3-integration-and-review)
-- [Common Mistakes to Avoid](#common-mistakes-to-avoid)
-  - [Conceptual Mistakes](#conceptual-mistakes)
-  - [Implementation Mistakes](#implementation-mistakes)
-  - [Exam-Specific Mistakes](#exam-specific-mistakes)
-- [Practice Problems](#practice-problems)
-  - [Problem 1: Hash Table Design](#problem-1-hash-table-design)
-  - [Problem 2: Graph Algorithm Integration](#problem-2-graph-algorithm-integration)
-  - [Problem 3: Dynamic Programming](#problem-3-dynamic-programming)
-  - [Problem 4: Balanced Tree Implementation](#problem-4-balanced-tree-implementation)
-  - [Problem 5: Multi-Algorithm Problem](#problem-5-multi-algorithm-problem)
-- [Conclusion](#conclusion)
-
 ## PRIORITIZED STUDY PLAN
 
 Based on your previous exam performance, I've organized this guide with priority levels:
@@ -889,6 +818,8 @@ map[key] = value;
 
 ## ADDITIONAL INSIGHTS FROM COURSE HOMEWORK
 
+Based on the homework assignments from your course, here are additional key concepts and focus areas that will likely be relevant for your final exam:
+
 ### From Homework 1-2: Fundamentals
 - **Move Semantics**: Understanding the purpose and implementation in C++
 - **Computational Complexity**: Analysis of algorithms using Big-O notation
@@ -1000,6 +931,20 @@ For recurrences of the form T(n) = aT(n/b) + f(n), where a ≥ 1 and b > 1:
   - Zig-zig steps (two same-direction rotations)
   - Zig-zag steps (two opposite-direction rotations)
 
+#### Red-Black Tree Operations
+- **Time**: O(log n) worst-case for all operations
+- **Properties**:
+  - Every node is either red or black
+  - Root and leaves (NIL) are black
+  - Red nodes must have black children
+  - All paths from root to leaves contain same number of black nodes
+- **Balancing Strategy**:
+  - Color changes
+  - Rotations (single or double)
+- **Advantages**:
+  - Guaranteed O(log n) performance
+  - Used in many standard library implementations
+
 ### 3. Graph Algorithm Analysis
 
 #### Bellman-Ford Algorithm
@@ -1100,7 +1045,7 @@ For recurrences of the form T(n) = aT(n/b) + f(n), where a ≥ 1 and b > 1:
 1. **Confusing time complexities**: Especially for similar algorithms (e.g., Dijkstra's vs. Prim's)
 2. **Misunderstanding algorithm requirements**: For example, when Dijkstra's algorithm works (no negative weights)
 3. **Applying incorrect design paradigms**: Using greedy approach when dynamic programming is needed
-4. **Misinterpreting balance conditions**: Especially for AVL trees
+4. **Misinterpreting balance conditions**: Especially for AVL and Red-Black trees
 
 ### Implementation Mistakes:
 1. **Off-by-one errors**: Especially in array indexing and loop conditions
