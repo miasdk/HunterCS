@@ -1,6 +1,297 @@
 # Comprehensive DSA Time Complexity Reference
 ## (Based on CSCI 33500 Course Material)
 
+## Table of Contents
+
+1. [Data Structure Operations](#data-structure-operations)
+   - [Array/Vector](#arrayvector)
+   - [Linked List](#linked-list-singlydoubly)
+   - [Stack](#stack-using-array-or-linked-list)
+   - [Queue](#queue-using-array-or-linked-list)
+   - [Binary Heap](#binary-heap)
+   - [Binary Search Tree (Unbalanced)](#binary-search-tree-unbalanced)
+   - [AVL Tree](#avl-tree)
+   - [Splay Tree](#splay-tree)
+   - [Hash Table](#hash-table)
+   - [Hash Table Collision Resolution](#hash-table-collision-resolution-strategies)
+   - [Graph Representation](#graph-representation)
+
+2. [Sorting Algorithms](#sorting-algorithms)
+
+3. [Selection Algorithms](#selection-algorithms)
+
+4. [Graph Algorithms](#graph-algorithms)
+   - [Traversal](#traversal)
+   - [Shortest Path](#shortest-path)
+   - [Minimum Spanning Tree](#minimum-spanning-tree)
+   - [Misc Graph Algorithms](#misc-graph-algorithms)
+
+5. [Dynamic Programming Algorithms](#dynamic-programming-algorithms)
+
+6. [STL Container Complexity (C++)](#stl-container-complexity-c)
+   - [std::vector](#stdvector)
+   - [std::list](#stdlist)
+   - [std::deque](#stddeque)
+   - [std::map / std::set](#stdmap--stdset-red-black-tree)
+   - [std::unordered_map / std::unordered_set](#stdunordered_map--stdunordered_set-hash-table)
+   - [std::priority_queue](#stdpriority_queue-binary-heap)
+
+7. [Special Cases to Remember](#special-cases-to-remember)
+
+## Data Structure Operations
+
+### Array/Vector
+| Operation | Average Case | Worst Case | Notes |
+|-----------|--------------|------------|-------|
+| Access by index | O(1) | O(1) | Direct memory address calculation |
+| Search (unsorted) | O(n) | O(n) | Linear scan required |
+| Search (sorted) | O(log n) | O(log n) | Using binary search |
+| Insert/Delete (at end) | O(1) amortized | O(1) amortized | May require occasional resize |
+| Insert/Delete (at beginning/middle) | O(n) | O(n) | Requires shifting elements |
+| Push/Pop (at end) | O(1) amortized | O(1) amortized | Vector may need to resize |
+
+### Linked List (Singly/Doubly)
+| Operation | Average Case | Worst Case | Notes |
+|-----------|--------------|------------|-------|
+| Access by index | O(n) | O(n) | Must traverse from head/tail |
+| Search | O(n) | O(n) | Must traverse to find element |
+| Insert/Delete (at beginning) | O(1) | O(1) | Just update head pointer |
+| Insert/Delete (at middle with pointer) | O(1) | O(1) | Given direct pointer to node |
+| Insert/Delete (at middle w/o pointer) | O(n) | O(n) | Must traverse to find position first |
+| Insert/Delete (at end with tail pointer) | O(1) | O(1) | With tail pointer maintained |
+| Insert/Delete (at end w/o tail pointer) | O(n) | O(n) | Must traverse to end first |
+
+### Stack (using Array or Linked List)
+| Operation | Average Case | Worst Case | Notes |
+|-----------|--------------|------------|-------|
+| Push | O(1) | O(1) | Amortized if using vector |
+| Pop | O(1) | O(1) | Amortized if using vector |
+| Peek (Top) | O(1) | O(1) | Just return last element |
+| Search | O(n) | O(n) | Must scan all elements |
+| Size | O(1) | O(1) | If size counter maintained |
+
+### Queue (using Array or Linked List)
+| Operation | Average Case | Worst Case | Notes |
+|-----------|--------------|------------|-------|
+| Enqueue | O(1) | O(1) | Add to back of queue |
+| Dequeue | O(1) | O(1) | Remove from front of queue |
+| Peek (Front) | O(1) | O(1) | Just return front element |
+| Search | O(n) | O(n) | Must scan all elements |
+| Size | O(1) | O(1) | If size counter maintained |
+
+### Binary Heap
+| Operation | Average Case | Worst Case | Notes |
+|-----------|--------------|------------|-------|
+| FindMin/FindMax | O(1) | O(1) | Root element |
+| Insert | O(log n) | O(log n) | Percolate up |
+| DeleteMin/DeleteMax | O(log n) | O(log n) | Remove root & percolate down |
+| BuildHeap | O(n) | O(n) | Not O(n log n) as might be expected |
+| Heapify | O(log n) | O(log n) | Restore heap property for subtree |
+| Decrease/Increase Key | O(log n) | O(log n) | Update & restore heap property |
+
+### Binary Search Tree (Unbalanced)
+| Operation | Average Case | Worst Case | Notes |
+|-----------|--------------|------------|-------|
+| Search | O(log n) | O(n) | Degenerate case is linked list |
+| Insert | O(log n) | O(n) | Find position then insert |
+| Delete | O(log n) | O(n) | Find, then remove and fix links |
+| FindMin/FindMax | O(log n) | O(n) | Leftmost/rightmost node |
+| Successor/Predecessor | O(log n) | O(n) | Next/previous in sorted order |
+| Height | O(log n) | O(n) | For balanced vs. degenerate trees |
+
+### AVL Tree
+| Operation | Average Case | Worst Case | Notes |
+|-----------|--------------|------------|-------|
+| Search | O(log n) | O(log n) | Tree height always O(log n) |
+| Insert | O(log n) | O(log n) | Find position, insert, rebalance |
+| Delete | O(log n) | O(log n) | Remove, then rebalance |
+| FindMin/FindMax | O(log n) | O(log n) | Leftmost/rightmost node |
+| Successor/Predecessor | O(log n) | O(log n) | Next/previous in sorted order |
+| Single Rotation | O(1) | O(1) | Constant pointer operations |
+| Double Rotation | O(1) | O(1) | Two single rotations |
+| Minimal AVL Tree of Height h | N/A | N/A | Follows recurrence: f(h) = f(h-1) + f(h-2) + 1 |
+
+### Splay Tree
+| Operation | Average Case | Worst Case | Amortized | Notes |
+|-----------|--------------|------------|-----------|-------|
+| Search | O(log n) | O(n) | O(log n) | Find and splay to root |
+| Insert | O(log n) | O(n) | O(log n) | Insert and splay to root |
+| Delete | O(log n) | O(n) | O(log n) | Find, splay, delete, reconnect |
+| FindMin/FindMax | O(log n) | O(n) | O(log n) | Find and splay to root |
+
+### Hash Table
+| Operation | Average Case | Worst Case | Notes |
+|-----------|--------------|------------|-------|
+| Search | O(1) | O(n) | Worst case with bad hash function |
+| Insert | O(1) | O(n) | Depends on collision resolution |
+| Delete | O(1) | O(n) | Depends on collision resolution |
+| Rehashing | O(n) | O(n) | Must rehash all elements |
+
+#### Hash Table (Collision Resolution Strategies)
+| Strategy | Search (Avg) | Insert (Avg) | Search (Worst) | Insert (Worst) | Notes |
+|----------|--------------|--------------|----------------|----------------|-------|
+| Separate Chaining | O(1 + α) | O(1 + α) | O(n) | O(n) | α = load factor |
+| Linear Probing | O(1/(1-α)) | O(1/(1-α)) | O(n) | O(n) | Primary clustering |
+| Quadratic Probing | O(1/(1-α)) | O(1/(1-α)) | O(n) | O(n) | Secondary clustering |
+| Double Hashing | O(1/(1-α)) | O(1/(1-α)) | O(n) | O(n) | Better distribution |
+
+### Graph Representation
+| Structure | Space | Add Vertex | Add Edge | Remove Vertex | Remove Edge | Query Edge | Query Adjacent Vertices |
+|-----------|-------|------------|----------|---------------|-------------|------------|-------------------------|
+| Adjacency Matrix | O(V²) | O(V²) | O(1) | O(V²) | O(1) | O(1) | O(V) |
+| Adjacency List | O(V+E) | O(1) | O(1) | O(V+E) | O(E) or O(degree(v)) | O(degree(v)) | O(degree(v)) |
+| Edge List | O(E) | O(1) | O(1) | O(E) | O(E) | O(E) | O(E) |
+
+## Sorting Algorithms
+
+| Algorithm | Best Case | Average Case | Worst Case | Space | Stable | Notes |
+|-----------|-----------|--------------|------------|-------|--------|-------|
+| Bubble Sort | O(n) | O(n²) | O(n²) | O(1) | Yes | With early stopping |
+| Selection Sort | O(n²) | O(n²) | O(n²) | O(1) | No | Always makes n(n-1)/2 comparisons |
+| Insertion Sort | O(n) | O(n²) | O(n²) | O(1) | Yes | Efficient for small or nearly sorted data |
+| Merge Sort | O(n log n) | O(n log n) | O(n log n) | O(n) | Yes | Divide and conquer |
+| Quicksort | O(n log n) | O(n log n) | O(n²) | O(log n) | No | In-place with O(log n) stack |
+| Heapsort | O(n log n) | O(n log n) | O(n log n) | O(1) | No | In-place sort |
+| Shell Sort | O(n log n) | O(n^(4/3)) | O(n²) | O(1) | No | Improvement on insertion sort |
+| Introsort | O(n log n) | O(n log n) | O(n log n) | O(log n) | No | Hybrid sort (quicksort, heapsort, insertion) |
+
+## Selection Algorithms
+
+| Algorithm | Best Case | Average Case | Worst Case | Space | Notes |
+|-----------|-----------|--------------|------------|-------|-------|
+| Quickselect | O(n) | O(n) | O(n²) | O(1) | Selection uses partitioning |
+
+## Graph Algorithms
+
+### Traversal
+| Algorithm | Time Complexity | Space Complexity | Notes |
+|-----------|----------------|------------------|-------|
+| Breadth-First Search (BFS) | O(V+E) | O(V) | Uses queue |
+| Depth-First Search (DFS) | O(V+E) | O(V) | Uses stack or recursion |
+| Topological Sort | O(V+E) | O(V) | For DAGs only |
+
+### Shortest Path
+| Algorithm | Time Complexity | Space Complexity | Notes |
+|-----------|----------------|------------------|-------|
+| Dijkstra's (binary heap) | O(E log V) | O(V) | No negative weights |
+| Dijkstra's (adjacency matrix) | O(V²) | O(V) | Dense graphs |
+| Bellman-Ford | O(V·E) | O(V) | Handles negative weights |
+| Floyd-Warshall (all pairs) | O(V³) | O(V²) | Dynamic programming approach |
+| Johnson's (all pairs) | O(V² log V + V·E) | O(V²) | For sparse graphs |
+| Unweighted Shortest Path (BFS) | O(V+E) | O(V) | All edges have equal weight |
+
+### Minimum Spanning Tree
+| Algorithm | Time Complexity | Space Complexity | Notes |
+|-----------|----------------|------------------|-------|
+| Prim's (binary heap) | O(E log V) | O(V) | Grows single tree |
+| Prim's (adjacency matrix) | O(V²) | O(V) | For dense graphs |
+| Kruskal's | O(E log E) or O(E log V) | O(V) | Uses Union-Find |
+
+### Misc Graph Algorithms
+| Algorithm | Time Complexity | Space Complexity | Notes |
+|-----------|----------------|------------------|-------|
+| Detect Cycle | O(V+E) | O(V) | Using DFS |
+| Bipartite Check | O(V+E) | O(V) | Using BFS/DFS |
+| Connected Components | O(V+E) | O(V) | Using DFS |
+| Strongly Connected Components | O(V+E) | O(V) | Using Kosaraju's algorithm |
+| Vertex Cover | NP-complete | - | 2-approximation in O(V+E) |
+
+## Dynamic Programming Algorithms
+
+| Algorithm | Time Complexity | Space Complexity | Notes |
+|-----------|----------------|------------------|-------|
+| Fibonacci Sequence | O(n) | O(n) or O(1) | With memoization or tabulation |
+| Longest Common Subsequence | O(m·n) | O(m·n) | Two sequences of length m, n |
+| 0/1 Knapsack | O(n·W) | O(n·W) | n items, capacity W |
+| Coin Change (minimum coins) | O(n·amount) | O(amount) | For n denominations |
+| Longest Increasing Subsequence | O(n²) or O(n log n) | O(n) | In an array of length n |
+
+## STL Container Complexity (C++)
+
+### std::vector
+| Operation | Time Complexity |
+|-----------|----------------|
+| Random access | O(1) |
+| Insert/erase at end | O(1) amortized |
+| Insert/erase at middle | O(n) |
+| Size | O(1) |
+
+### std::list
+| Operation | Time Complexity |
+|-----------|----------------|
+| Random access | O(n) |
+| Insert/erase at position | O(1) with iterator |
+| Splice | O(1) |
+| Size | O(1) |
+
+### std::deque
+| Operation | Time Complexity |
+|-----------|----------------|
+| Random access | O(1) |
+| Insert/erase at begin/end | O(1) amortized |
+| Insert/erase at middle | O(n) |
+
+### std::map / std::set (Red-Black Tree)
+| Operation | Time Complexity |
+|-----------|----------------|
+| Insert | O(log n) |
+| Erase | O(log n) |
+| Find | O(log n) |
+| Lower/Upper bound | O(log n) |
+
+### std::unordered_map / std::unordered_set (Hash Table)
+| Operation | Time Complexity |
+|-----------|----------------|
+| Insert | O(1) average, O(n) worst |
+| Erase | O(1) average, O(n) worst |
+| Find | O(1) average, O(n) worst |
+
+### std::priority_queue (Binary Heap)
+| Operation | Time Complexity |
+|-----------|----------------|
+| Push | O(log n) |
+| Pop | O(log n) |
+| Top | O(1) |
+
+## Special Cases to Remember
+
+1. **BuildHeap Complexity**: 
+   - Despite calling percolateDown (O(log n)) on n/2 elements, the tight bound is O(n)
+   - This is because percolateDown costs less for nodes near the leaves
+
+2. **AVL Tree Minimal Size**: 
+   - Height h: Minimum nodes = f(h) = f(h-1) + f(h-2) + 1
+   - Base cases: f(0) = 1, f(1) = 2
+   - Height 8: 88 nodes
+
+3. **Hash Table Load Factor**: 
+   - Optimal around 0.7 for open addressing
+   - Can be higher for separate chaining
+   - Performance degrades as load factor approaches 1
+
+4. **Dijkstra's vs. Prim's**:
+   - Both use similar structure with priority queues
+   - Dijkstra's tracks distance from source
+   - Prim's tracks distance to MST
+
+5. **When to Use Binary Heaps vs. Other Structures**:
+   - Binary heaps efficient for basic priority queue
+   - Inefficient for arbitrary deletion/decrease key
+   - Fibonacci heaps theoretically better for decrease key (O(1) amortized)
+
+6. **Topological Sort Requirement**:
+   - Only defined for Directed Acyclic Graphs (DAGs)
+   - Multiple valid orderings may exist
+
+7. **Binary Search Tree Worst Case**:
+   - Happens when tree degenerates to linked list (e.g., sorted insertions)
+   - AVL/Red-Black trees prevent this degeneration
+
+8. **Double Hashing Requirements**:
+   - Second hash function must never return 0
+   - Ideally, second hash and table size are relatively prime# Comprehensive DSA Time Complexity Reference
+## (Based on CSCI 33500 Course Material)
+
 ## Data Structure Operations
 
 ### Array/Vector
