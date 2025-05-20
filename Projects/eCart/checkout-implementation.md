@@ -1,71 +1,434 @@
-# E-commerce Checkout and Order Processing Implementation Guide
+# Complete E-commerce Checkout & Order Processing Implementation Guide
+
+Now that you've updated your database schema with the necessary tables for orders, order items, and shipping information, this guide will walk you through the complete implementation of the checkout flow.
 
 ## Table of Contents
-1. [Overview](#overview)
-2. [Implementation Steps](#implementation-steps)
-3. [Required Components](#required-components)
-   - [Frontend Components](#frontend-components)
-   - [Backend Updates](#backend-updates)
-4. [Component Code](#component-code)
+1. [Backend Implementation](#backend-implementation)
+   - [PaymentService.js](#paymentservicejs)
+   - [OrderService.js Changes](#orderservicejs-changes)
+   - [OrderController.js Updates](#ordercontrollerjs-updates)
+2. [Frontend Implementation](#frontend-implementation)
+   - [CartContext.jsx](#cartcontextjsx)
+   - [CartPage.jsx](#cartpagejsx)
    - [CheckoutPage.jsx](#checkoutpagejsx)
-   - [Updated PaymentForm.jsx](#updated-paymentformjsx)
+   - [PaymentForm.jsx](#paymentformjsx)
    - [OrderConfirmationPage.jsx](#orderconfirmationpagejsx)
    - [OrdersPage.jsx](#orderspagejsx)
-   - [CartPage.jsx](#cartpagejsx)
-   - [Updated CartContext.jsx](#updated-cartcontextjsx)
-   - [Updated App.jsx](#updated-appjsx)
-5. [Backend Enhancements](#backend-enhancements)
-   - [Updated OrderService.js](#updated-orderservicejs)
-   - [Shipping Info Database Schema](#shipping-info-database-schema)
-6. [Testing the Order Flow](#testing-the-order-flow)
+3. [Route Updates](#route-updates)
+   - [App.jsx Updates](#appjsx-updates)
+4. [Stripe Configuration](#stripe-configuration)
+5. [Testing](#testing)
 
-## Overview
+## Backend Implementation
 
-This guide outlines the implementation of a complete checkout and order processing system for your e-commerce application, building on your existing order model, service, and controller structure.
+### PaymentService.js
 
-**The Complete Order Flow:**
+Create a new file `services/PaymentService.js`:
 
-1. User reviews items in cart
-2. User clicks "Checkout" button
-3. User enters shipping information
-4. User enters payment information
-5. Order is created in database with "pending" status
-6. Payment is processed via Stripe
-7. Order status is updated to "paid"
-8. User is redirected to order confirmation page
-9. Order history is available in user account
+```javascript
+// services/PaymentService.js
+import Stripe from 'stripe';
+import dotenv from 'dotenv';
 
-## Implementation Steps
+dotenv.config();
 
-1. Create a checkout page with shipping form and payment integration
-2. Update the payment form to work with cart data
-3. Create an order confirmation page
-4. Enhance the orders page to show order history
-5. Update CartContext to handle checkout navigation
-6. Update App.jsx with new routes
-7. Enhance OrderService to handle shipping information
-8. Create a shipping info table in the database
+// Initialize Stripe with your secret key (from .env file)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-## Required Components
+class PaymentService {
+    // Create a PaymentIntent for the order
+    async createPaymentIntent(amount) {
+        try {
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: Math.round(amount * 100), // Convert to cents
+                currency: 'usd',
+                payment_method_types: ['card'],
+            });
+            
+            return {
+                clientSecret: paymentIntent.client_secret,
+                stripePaymentId: paymentIntent.id
+            };
+        } catch (error) {
+            console.error("❌ Error creating payment intent:", error.message);
+            throw new Error("Payment processing error: " + error.message);
+        }
+    }
+}
 
-### Frontend Components
+export default new PaymentService();
+```
 
-- **CheckoutPage**: Displays cart summary and collects shipping/payment information
-- **PaymentForm** (updated): Processes payments through Stripe
-- **OrderConfirmationPage**: Shows details after successful order
-- **OrdersPage** (enhanced): Displays user's order history
-- **CartPage** (with checkout button): Allows navigation to checkout
+### OrderService.js Changes
 
-### Backend Updates
+Update your `services/OrderService.js` to add the shipping info functionality:
 
-- **OrderService** (enhanced): Support for shipping information
-- **Database Schema**: New shipping_info table
+```javascript
+// services/OrderService.js
+import OrderModel from '../models/OrderModel.js'; 
+import PaymentService from './PaymentService.js';
+import { pool } from '../config/database.js';
 
-## Component Code
+class OrderService {
+    // Create a new order and generate a PaymentIntent
+    async createOrder(userId, orderItems, shippingInfo) {
+        const client = await pool.connect();
+        try {
+            await client.query("BEGIN");
+
+            // Step 1: Calculate total price
+            const totalPrice = this.calculateTotalPrice(orderItems);
+
+            // Step 2: Create a PaymentIntent with Stripe
+            const { clientSecret, stripePaymentId } = await PaymentService.createPaymentIntent(totalPrice);
+
+            // Step 3: Create a new order in the database (initially 'pending')
+            const order = await OrderModel.createOrder(userId, totalPrice, "pending", stripePaymentId);
+            const orderId = order.id;
+
+            // Step 4: Add items to the order
+            await OrderModel.addOrderItems(orderId, orderItems);
+
+            // Step 5: Store shipping information
+            if (shippingInfo) {
+                await this.saveShippingInfo(orderId, userId, shippingInfo);
+            }
+
+            await client.query("COMMIT");
+            return { order, clientSecret }; // Send clientSecret to frontend
+        } catch (error) {
+            await client.query("ROLLBACK");
+            console.error("❌ OrderService.createOrder(): Error:", error.message);
+            throw new Error("Order creation failed: " + error.message);
+        } finally {
+            client.release();
+        }
+    }
+
+    // Save shipping information
+    async saveShippingInfo(orderId, userId, shippingInfo) {
+        const query = `
+            INSERT INTO shipping_info (order_id, user_id, name, address, city, state, zip, email)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING *;
+        `;
+        
+        const values = [
+            orderId, 
+            userId, 
+            shippingInfo.name,
+            shippingInfo.address,
+            shippingInfo.city,
+            shippingInfo.state,
+            shippingInfo.zip,
+            shippingInfo.email
+        ];
+        
+        try {
+            const result = await pool.query(query, values);
+            return result.rows[0];
+        } catch (error) {
+            console.error("Error saving shipping info:", error.message);
+            throw new Error("Failed to save shipping information");
+        }
+    }
+
+    // Keep your existing methods:
+    // - confirmPayment
+    // - calculateTotalPrice
+    // - getOrderById
+    // - getOrdersByUserId
+    // - updateOrderStatus
+    // - deleteOrder
+    // - getAllOrders
+}
+
+// Export as a single instance
+export default new OrderService();
+```
+
+### OrderController.js Updates
+
+Make sure your controller is ready to receive shipping info:
+
+```javascript
+// controllers/OrderController.js
+static async createOrder(req, res) {
+    try {
+        const { userId, orderItems, shippingInfo } = req.body;
+        
+        // Validate input
+        if (!userId || !orderItems || orderItems.length === 0) {
+            return res.status(400).json({ error: 'Invalid order data' });
+        }
+        
+        const order = await OrderService.createOrder(userId, orderItems, shippingInfo);
+        res.status(201).json(order);
+    } catch (error) {
+        console.log("OrderController.createOrder(): Error:", error.message);
+        res.status(500).json({ error: error.message });
+    }
+}
+```
+
+## Frontend Implementation
+
+### CartContext.jsx
+
+Create or update your CartContext:
+
+```jsx
+// context/CartContext.jsx
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const CartContext = createContext();
+
+export const useCart = () => useContext(CartContext);
+
+export const CartProvider = ({ children }) => {
+    const [cartItems, setCartItems] = useState([]);
+    const [cartTotal, setCartTotal] = useState(0);
+    const navigate = useNavigate();
+    
+    // Calculate total whenever cart changes
+    useEffect(() => {
+        const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        setCartTotal(total);
+    }, [cartItems]);
+    
+    // Load cart from localStorage on initial load
+    useEffect(() => {
+        const savedCart = localStorage.getItem('cart');
+        if (savedCart) {
+            setCartItems(JSON.parse(savedCart));
+        }
+    }, []);
+    
+    // Save cart to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('cart', JSON.stringify(cartItems));
+    }, [cartItems]);
+    
+    // Add item to cart
+    const addToCart = (product, quantity = 1) => {
+        setCartItems(prevItems => {
+            const existingItemIndex = prevItems.findIndex(item => item.product_id === product.product_id);
+            
+            if (existingItemIndex >= 0) {
+                // Item exists, update quantity
+                const updatedItems = [...prevItems];
+                updatedItems[existingItemIndex] = {
+                    ...updatedItems[existingItemIndex],
+                    quantity: updatedItems[existingItemIndex].quantity + quantity
+                };
+                return updatedItems;
+            } else {
+                // Item doesn't exist, add new
+                return [...prevItems, { ...product, quantity }];
+            }
+        });
+    };
+    
+    // Remove item from cart
+    const removeFromCart = (productId) => {
+        setCartItems(prevItems => prevItems.filter(item => item.product_id !== productId));
+    };
+    
+    // Update item quantity
+    const updateQuantity = (productId, quantity) => {
+        if (quantity <= 0) {
+            removeFromCart(productId);
+            return;
+        }
+        
+        setCartItems(prevItems => 
+            prevItems.map(item => 
+                item.product_id === productId ? { ...item, quantity } : item
+            )
+        );
+    };
+    
+    // Clear cart
+    const clearCart = () => {
+        setCartItems([]);
+    };
+    
+    // Proceed to checkout
+    const proceedToCheckout = () => {
+        if (cartItems.length === 0) {
+            alert('Your cart is empty');
+            return;
+        }
+        
+        navigate('/checkout');
+    };
+    
+    return (
+        <CartContext.Provider value={{
+            cartItems,
+            cartTotal,
+            addToCart,
+            removeFromCart,
+            updateQuantity,
+            clearCart,
+            proceedToCheckout
+        }}>
+            {children}
+        </CartContext.Provider>
+    );
+};
+```
+
+### CartPage.jsx
+
+Create a CartPage component:
+
+```jsx
+// pages/CartPage.jsx
+import React from 'react';
+import { useCart } from '../context/CartContext';
+import { Link } from 'react-router-dom';
+
+const CartPage = () => {
+    const { 
+        cartItems, 
+        cartTotal, 
+        removeFromCart, 
+        updateQuantity, 
+        proceedToCheckout 
+    } = useCart();
+    
+    if (cartItems.length === 0) {
+        return (
+            <div className="container mx-auto p-4">
+                <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
+                <div className="bg-gray-100 p-6 rounded-lg text-center">
+                    <p className="mb-4">Your cart is empty.</p>
+                    <Link to="/" className="text-blue-500 hover:underline">
+                        Start Shopping
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+    
+    return (
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2">
+                    <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                        <table className="w-full">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="py-3 px-4 text-left">Product</th>
+                                    <th className="py-3 px-4 text-center">Quantity</th>
+                                    <th className="py-3 px-4 text-right">Price</th>
+                                    <th className="py-3 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                                {cartItems.map(item => (
+                                    <tr key={item.product_id}>
+                                        <td className="py-4 px-4">
+                                            <div className="flex items-center">
+                                                <img 
+                                                    src={item.image} 
+                                                    alt={item.title} 
+                                                    className="w-16 h-16 object-cover rounded" 
+                                                />
+                                                <div className="ml-4">
+                                                    <p className="font-medium">{item.title}</p>
+                                                    <p className="text-sm text-gray-500">{item.brand_name}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-4">
+                                            <div className="flex justify-center items-center">
+                                                <button 
+                                                    className="w-8 h-8 bg-gray-200 rounded-l-md flex items-center justify-center"
+                                                    onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                                                >
+                                                    -
+                                                </button>
+                                                <span className="w-10 text-center">{item.quantity}</span>
+                                                <button 
+                                                    className="w-8 h-8 bg-gray-200 rounded-r-md flex items-center justify-center"
+                                                    onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-4 text-right">
+                                            ${(item.price * item.quantity).toFixed(2)}
+                                        </td>
+                                        <td className="py-4 px-4 text-right">
+                                            <button 
+                                                className="text-red-500 hover:text-red-700"
+                                                onClick={() => removeFromCart(item.product_id)}
+                                            >
+                                                Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div>
+                    <div className="bg-white shadow-md rounded-lg p-6">
+                        <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+                        
+                        <div className="space-y-3">
+                            <div className="flex justify-between">
+                                <span>Subtotal</span>
+                                <span>${cartTotal.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Shipping</span>
+                                <span>FREE</span>
+                            </div>
+                            <div className="border-t pt-3 mt-3">
+                                <div className="flex justify-between font-semibold">
+                                    <span>Total</span>
+                                    <span>${cartTotal.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button
+                            onClick={proceedToCheckout}
+                            className="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                        >
+                            Proceed to Checkout
+                        </button>
+                        
+                        <div className="mt-4 text-center">
+                            <Link to="/" className="text-blue-500 hover:underline">
+                                Continue Shopping
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default CartPage;
+```
 
 ### CheckoutPage.jsx
 
+Create a CheckoutPage component:
+
 ```jsx
+// pages/CheckoutPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -83,7 +446,7 @@ const CheckoutPage = () => {
         city: '',
         state: '',
         zip: '',
-        email: ''
+        email: user?.email || ''
     });
     
     const [orderCreated, setOrderCreated] = useState(false);
@@ -95,6 +458,13 @@ const CheckoutPage = () => {
             navigate('/login', { state: { from: '/checkout' } });
         }
     }, [user, navigate]);
+    
+    // Redirect to cart if cart is empty
+    useEffect(() => {
+        if (cartItems.length === 0 && !orderCreated) {
+            navigate('/cart');
+        }
+    }, [cartItems, navigate, orderCreated]);
     
     // Handle shipping info changes
     const handleInputChange = (e) => {
@@ -126,7 +496,7 @@ const CheckoutPage = () => {
         }, 1500);
     };
     
-    if (!user || cartItems.length === 0) {
+    if (!user || (cartItems.length === 0 && !orderCreated)) {
         return <div className="container mx-auto p-4">Loading...</div>;
     }
     
@@ -259,12 +629,15 @@ const CheckoutPage = () => {
 export default CheckoutPage;
 ```
 
-### Updated PaymentForm.jsx
+### PaymentForm.jsx
+
+Update your PaymentForm component:
 
 ```jsx
+// components/PaymentForm.jsx
 import React, { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
-import { API_BASE_URL } from "../config/constants";
+import { API_BASE_URL } from "../config/constants"; // Make sure you have this file
 
 const PaymentForm = ({ userId, orderItems, shippingInfo, onPaymentSuccess }) => {
     const stripe = useStripe();
@@ -278,6 +651,14 @@ const PaymentForm = ({ userId, orderItems, shippingInfo, onPaymentSuccess }) => 
         if (!userId || !orderItems || orderItems.length === 0) {
             setErrorMessage("Invalid order data");
             return;
+        }
+        
+        // Validate shipping info
+        for (const [key, value] of Object.entries(shippingInfo)) {
+            if (!value) {
+                setErrorMessage(`Please fill in your ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+                return;
+            }
         }
     
         setLoading(true);
@@ -377,7 +758,10 @@ export default PaymentForm;
 
 ### OrderConfirmationPage.jsx
 
+Create an OrderConfirmationPage component:
+
 ```jsx
+// pages/OrderConfirmationPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { API_BASE_URL } from '../config/constants';
@@ -459,6 +843,17 @@ const OrderConfirmationPage = () => {
                         <span>${parseFloat(order[0].total_price).toFixed(2)}</span>
                     </div>
                 </div>
+                
+                {/* Shipping Info */}
+                {order[0].shipping_name && (
+                    <div className="mt-4 pt-3 border-t">
+                        <h3 className="text-lg font-medium mb-2">Shipping Information</h3>
+                        <p>{order[0].shipping_name}</p>
+                        <p>{order[0].shipping_address}</p>
+                        <p>{order[0].shipping_city}, {order[0].shipping_state} {order[0].shipping_zip}</p>
+                        <p>{order[0].shipping_email}</p>
+                    </div>
+                )}
             </div>
             
             <div className="flex justify-between">
@@ -478,386 +873,10 @@ export default OrderConfirmationPage;
 
 ### OrdersPage.jsx
 
+Update your OrdersPage component:
+
 ```jsx
+// pages/OrdersPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../config/constants';
-
-const OrdersPage = () => {
-    const { user } = useAuth();
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    
-    useEffect(() => {
-        const fetchOrders = async () => {
-            if (!user) return;
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/orders/user/${user.uid}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch orders');
-                }
-                
-                const data = await response.json();
-                
-                // Group by order_id
-                const groupedOrders = data.reduce((acc, item) => {
-                    if (!acc[item.order_id]) {
-                        acc[item.order_id] = {
-                            id: item.order_id,
-                            date: new Date(item.created_at),
-                            status: item.status,
-                            totalPrice: parseFloat(item.total_price),
-                            items: []
-                        };
-                    }
-                    
-                    acc[item.order_id].items.push({
-                        product_title: item.product_title,
-                        quantity: item.quantity,
-                        unitPrice: parseFloat(item.unit_price)
-                    });
-                    
-                    return acc;
-                }, {});
-                
-                setOrders(Object.values(groupedOrders));
-                setLoading(false);
-            } catch (err) {
-                setError(err.message);
-                setLoading(false);
-            }
-        };
-        
-        fetchOrders();
-    }, [user]);
-    
-    if (!user) {
-        return (
-            <div className="container mx-auto p-4">
-                <p>Please log in to view your orders.</p>
-                <Link to="/login" className="text-blue-500 hover:underline">
-                    Log In
-                </Link>
-            </div>
-        );
-    }
-    
-    if (loading) {
-        return <div className="container mx-auto p-4">Loading orders...</div>;
-    }
-    
-    if (error) {
-        return (
-            <div className="container mx-auto p-4">
-                <div className="bg-red-100 text-red-800 p-4 rounded-lg">
-                    {error}
-                </div>
-            </div>
-        );
-    }
-    
-    if (orders.length === 0) {
-        return (
-            <div className="container mx-auto p-4">
-                <h1 className="text-2xl font-bold mb-6">My Orders</h1>
-                <div className="bg-gray-100 p-6 rounded-lg text-center">
-                    <p className="mb-4">You don't have any orders yet.</p>
-                    <Link to="/" className="text-blue-500 hover:underline">
-                        Start Shopping
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-    
-    return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">My Orders</h1>
-            
-            <div className="space-y-6">
-                {orders.map(order => (
-                    <div key={order.id} className="bg-white shadow-md rounded-lg p-6">
-                        <div className="flex justify-between mb-4">
-                            <div>
-                                <p className="text-sm text-gray-500">Order placed</p>
-                                <p className="font-medium">{order.date.toLocaleDateString()}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Order #</p>
-                                <p className="font-medium">{order.id}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Total</p>
-                                <p className="font-medium">${order.totalPrice.toFixed(2)}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Status</p>
-                                <p className={`font-medium ${
-                                    order.status === 'delivered' ? 'text-green-600' : 
-                                    order.status === 'shipped' ? 'text-blue-600' : 
-                                    order.status === 'paid' ? 'text-purple-600' :
-                                    'text-gray-600'
-                                }`}>
-                                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div className="divide-y">
-                            {order.items.map((item, index) => (
-                                <div key={index} className="py-3 flex justify-between">
-                                    <div>
-                                        <p className="font-medium">{item.product_title}</p>
-                                        <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
-                                    </div>
-                                    <p className="font-medium">${item.unitPrice.toFixed(2)}</p>
-                                </div>
-                            ))}
-                        </div>
-                        
-                        <Link 
-                            to={`/order-confirmation/${order.id}`} 
-                            className="mt-4 text-blue-500 hover:underline block text-right"
-                        >
-                            View Order Details
-                        </Link>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-export default OrdersPage;
-```
-
-### CartPage.jsx
-
-```jsx
-import React from 'react';
-import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom';
-
-const CartPage = () => {
-    const { 
-        cartItems, 
-        cartTotal, 
-        removeFromCart, 
-        updateQuantity, 
-        proceedToCheckout 
-    } = useCart();
-    
-    if (cartItems.length === 0) {
-        return (
-            <div className="container mx-auto p-4">
-                <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
-                <div className="bg-gray-100 p-6 rounded-lg text-center">
-                    <p className="mb-4">Your cart is empty.</p>
-                    <Link to="/" className="text-blue-500 hover:underline">
-                        Start Shopping
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-    
-    return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2">
-                    <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                        <table className="w-full">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="py-3 px-4 text-left">Product</th>
-                                    <th className="py-3 px-4 text-center">Quantity</th>
-                                    <th className="py-3 px-4 text-right">Price</th>
-                                    <th className="py-3 px-4 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {cartItems.map(item => (
-                                    <tr key={item.product_id}>
-                                        <td className="py-4 px-4">
-                                            <div className="flex items-center">
-                                                <img 
-                                                    src={item.image} 
-                                                    alt={item.title} 
-                                                    className="w-16 h-16 object-cover rounded" 
-                                                />
-                                                <div className="ml-4">
-                                                    <p className="font-medium">{item.title}</p>
-                                                    <p className="text-sm text-gray-500">{item.brand_name}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-4">
-                                            <div className="flex justify-center items-center">
-                                                <button 
-                                                    className="w-8 h-8 bg-gray-200 rounded-l-md flex items-center justify-center"
-                                                    onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
-                                                >
-                                                    -
-                                                </button>
-                                                <span className="w-10 text-center">{item.quantity}</span>
-                                                <button 
-                                                    className="w-8 h-8 bg-gray-200 rounded-r-md flex items-center justify-center"
-                                                    onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
-                                                >
-                                                    +
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-4 text-right">
-                                            ${(item.price * item.quantity).toFixed(2)}
-                                        </td>
-                                        <td className="py-4 px-4 text-right">
-                                            <button 
-                                                className="text-red-500 hover:text-red-700"
-                                                onClick={() => removeFromCart(item.product_id)}
-                                            >
-                                                Remove
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div>
-                    <div className="bg-white shadow-md rounded-lg p-6">
-                        <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
-                        
-                        <div className="space-y-3">
-                            <div className="flex justify-between">
-                                <span>Subtotal</span>
-                                <span>${cartTotal.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>Shipping</span>
-                                <span>FREE</span>
-                            </div>
-                            <div className="border-t pt-3 mt-3">
-                                <div className="flex justify-between font-semibold">
-                                    <span>Total</span>
-                                    <span>${cartTotal.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button
-                            className="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-                            onClick={proceedToCheckout}
-                        >
-                            Proceed to Checkout
-                        </button>
-                        
-                        <div className="mt-4 text-center">
-                            <Link to="/" className="text-blue-500 hover:underline">
-                                Continue Shopping
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default CartPage;
-```
-
-### Updated CartContext.jsx
-
-```jsx
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-const CartContext = createContext();
-
-export const useCart = () => useContext(CartContext);
-
-export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState([]);
-    const [cartTotal, setCartTotal] = useState(0);
-    const navigate = useNavigate();
-    
-    // Calculate total whenever cart changes
-    useEffect(() => {
-        const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        setCartTotal(total);
-    }, [cartItems]);
-    
-    // Load cart from localStorage on initial load
-    useEffect(() => {
-        const savedCart = localStorage.getItem('cart');
-        if (savedCart) {
-            setCartItems(JSON.parse(savedCart));
-        }
-    }, []);
-    
-    // Save cart to localStorage whenever it changes
-    useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-    }, [cartItems]);
-    
-    // Add item to cart
-    const addToCart = (product, quantity = 1) => {
-        setCartItems(prevItems => {
-            const existingItemIndex = prevItems.findIndex(item => item.product_id === product.product_id);
-            
-            if (existingItemIndex >= 0) {
-                // Item exists, update quantity
-                const updatedItems = [...prevItems];
-                updatedItems[existingItemIndex] = {
-                    ...updatedItems[existingItemIndex],
-                    quantity: updatedItems[existingItemIndex].quantity + quantity
-                };
-                return updatedItems;
-            } else {
-                // Item doesn't exist, add new
-                return [...prevItems, { ...product, quantity }];
-            }
-        });
-    };
-    
-    // Remove item from cart
-    const removeFromCart = (productId) => {
-        setCartItems(prevItems => prevItems.filter(item => item.product_id !== productId));
-    };
-    
-    // Update item quantity
-    const updateQuantity = (productId, quantity) => {
-        if (quantity <= 0) {
-            removeFromCart(productId);
-            return;
-        }
-        
-        setCartItems(prevItems => 
-            prevItems.map(item => 
-                item.product_id === productId ? { ...item, quantity } : item
-            )
-        );
-    };
-    
-    // Clear cart
-    const clearCart = () => {
-        setCartItems([]);
-    };
-    
-    // Proceed to checkout
-    const proceedToCheckout = () => {
-        if (cartItems.length === 0) {
-            alert('Your cart is empty');
-            return;
-        }
-        
-        navigate('/checkout');
-    };
+import { useAuth } from '../context/
