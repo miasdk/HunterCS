@@ -358,9 +358,9 @@ The key modification is adding support for a third register operand and being ab
 ## Question 6: MIPS Instruction from Datapath Diagram (15 points)
 
 ### Question:
-Figure 4.5.7 from your textbook shows a datapath for implementing a new MIPS instruction. Based on this diagram (reproduced below), answer the following questions:
+Figure 4.57 from your textbook (shown below) displays a close-up of a MIPS datapath with a 2:1 multiplexer added to select the signed immediate as an ALU input. Based on this diagram, answer the following questions:
 
-![Figure 4.5.7: Datapath for a new instruction]
+![Figure 4.57: A close-up of the datapath showing a 2:1 multiplexer for selecting signed immediate as ALU input]
 
 a) What MIPS instruction is this datapath designed to implement? Describe the operation in both English and RTL notation.
 
@@ -374,75 +374,84 @@ d) Explain how the datapath executes this instruction step-by-step, including th
 
 #### Part a) Instruction identification and description
 
-Since the exact figure is not provided, I'll infer that this is likely a datapath for the MIPS Store Byte (SB) instruction.
+The diagram shows a datapath modified to handle I-type instructions that use immediate values as one of the ALU inputs. This is evident from the highlighted 2:1 multiplexer (ALUSrc) that selects between a register value and a sign-extended immediate value.
 
-**Operation in English**: Store the least significant byte of register rt to the memory location specified by the sum of register rs and the sign-extended immediate value.
+While this datapath supports multiple I-type instructions, the most common and representative instruction is the **Load Word (LW)** instruction.
 
-**RTL Notation**: Memory[R[rs] + SignExt(imm)] ← R[rt][7:0]
+**Operation in English**: Load Word loads a 32-bit word from memory at the address calculated by adding a sign-extended 16-bit immediate offset to the contents of a base register (rs), and places the result in register rt.
+
+**RTL Notation**: R[rt] ← Memory[R[rs] + SignExt(immediate)]
 
 #### Part b) Machine code format
 
-The Store Byte (SB) instruction uses the I-type format:
+The Load Word (LW) instruction uses the I-type format:
 
 ```
 | opcode (6 bits) | rs (5 bits) | rt (5 bits) | immediate (16 bits) |
-|     101000      |    sssss    |    ttttt    |    iiiiiiiiiiiiiiii   |
+|     100011      |    sssss    |    ttttt    |   iiiiiiiiiiiiiiii  |
 ```
 
-- Opcode: 101000 (SB)
-- rs: base register for memory address
-- rt: register containing the byte to store
-- immediate: 16-bit offset added to base address
+- Opcode: 100011 (35 in decimal) - identifies this as a LW instruction
+- rs: 5-bit base register address (source for memory address calculation)
+- rt: 5-bit destination register address (where loaded data will be stored)
+- immediate: 16-bit offset value (sign-extended for address calculation)
 
 #### Part c) Example instruction and machine code
 
 **MIPS Assembly**:
 ```
-sb $t1, 8($t0)   # Store the least significant byte of $t1 to memory address $t0+8
+lw $t0, 8($s0)   # Load word from memory at address $s0+8 into register $t0
 ```
 
 **Machine Code**:
-- Opcode: 101000 (SB)
-- rs: $t0 = 01000
-- rt: $t1 = 01001
+- Opcode: 100011 (LW)
+- rs: $s0 = 10000 (register 16)
+- rt: $t0 = 01000 (register 8)
 - immediate: 8 = 0000000000001000
 
-Binary: 10100001000010010000000000001000
-Hexadecimal: 0xA9090008
+Binary: 10001110000010000000000000001000
+Hexadecimal: 0x8E080008
 
 #### Part d) Execution step-by-step
 
-1. **Instruction Fetch**:
-   - PC provides address to instruction memory
-   - Instruction is fetched and decoded
+The execution of a Load Word instruction in the pipelined datapath shown proceeds through the following steps:
 
-2. **Register Read**:
-   - Register File reads registers rs ($t0) and rt ($t1)
-   - rs value goes to ALU input A
-   - rt value goes to the data input of memory
+1. **Instruction Fetch (IF) Stage** (not shown in this diagram):
+   - The instruction is fetched from instruction memory
+   - The PC is incremented
 
-3. **Address Calculation**:
-   - 16-bit immediate field is sign-extended to 32 bits
-   - ALU adds sign-extended immediate to rs value
-   - Result is the effective memory address
+2. **Instruction Decode (ID) Stage**:
+   - The instruction is decoded, identifying it as LW
+   - Control signals are generated, including setting ALUSrc = 1 to select the immediate value
+   - Register values are read from the register file (rs for base address)
+   - The 16-bit immediate value is sign-extended to 32 bits
+   - All values are passed to the ID/EX pipeline register
 
-4. **Byte Extraction**:
-   - Only the least significant byte (8 bits) of rt is used
-   - Data alignment network selects appropriate byte position based on address
+3. **Execute (EX) Stage**:
+   - The ALUSrc multiplexer (highlighted in blue) selects the sign-extended immediate value
+   - The ALU adds the base register value and immediate to calculate the memory address
+   - The ALU result (memory address) and data to be stored are passed to the EX/MEM pipeline register
 
-5. **Memory Write**:
-   - Memory write control signal is activated
-   - Memory writes the byte at the calculated address
-   - Memory write enable is set to indicate a byte write instead of a word write
+4. **Memory (MEM) Stage**:
+   - The calculated address is sent to data memory
+   - Data is read from memory at this address
+   - The memory data and destination register information are passed to the MEM/WB pipeline register
 
-The key components in the diagram would include:
-- Sign extension unit for the immediate value
-- ALU for address calculation
-- Byte selection logic to extract the correct byte from rt
-- Memory write logic with byte enable signals
-- Control unit generating appropriate control signals
+5. **Write Back (WB) Stage**:
+   - The MUX in the WB stage selects data from memory
+   - This data is written back to the destination register (rt)
 
-This instruction is essential for dealing with byte-sized data, allowing programs to store individual bytes without affecting adjacent memory locations.
+**Forwarding Unit Role**: The diagram shows a forwarding unit that monitors dependencies between instructions and can route data directly from the ALU output or memory output back to the ALU inputs, bypassing the register file when a value is needed before it has been written back.
+
+The specific datapath elements from the diagram that play key roles:
+- **ALUSrc Multiplexer**: Selects the immediate value instead of a register value as the second ALU input
+- **Forwarding Multiplexers**: Allow bypassing the register file when data dependencies exist
+- **ALU**: Computes the memory address by adding the base register value and the immediate offset
+- **Data Memory**: Retrieves the data from the calculated address
+- **Write-Back Multiplexer**: Selects the data from memory to be written to the register file
+
+This implementation efficiently handles the LW instruction while supporting forwarding to minimize pipeline stalls due to data hazards.
+
 
 ## Question 7: Short Answer Questions (10 points)
 
