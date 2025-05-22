@@ -1,99 +1,212 @@
-7.7 Quicksort
-As its name implies for C++, quicksort has historically been the fastest known generic
-sorting algorithm in practice. Its average running time is O(N logN). It is very fast, mainly
-due to a very tight and highly optimized inner loop. It has O(N2) worst-case performance,
-but this can be made exponentially unlikely with a little effort
+# Comprehensive Sorting Algorithms Reference
 
-Arbitrarily choose
-any item, and then form three groups: those smaller than the chosen item, those equal to
-the chosen item, and those larger than the chosen item. Recursively sort the first and third
-groups, and then concatenate the three groups
+## Table of Contents
+1. [Insertion Sort](#insertion-sort)
+2. [Mergesort](#mergesort)
+3. [Quicksort](#quicksort)
+4. [Quickselect](#quickselect)
+5. [Theoretical Foundations](#theoretical-foundations)
 
-1. If the number of elements in S is 0 or 1, then return.
-2. Pick any element v in S. This is called the pivot.
-3. Partition S − {v} (the remaining elements in S) into two disjoint groups: S1 = {x ∈
-S − {v}|x ≤ v}, and S2 = {x ∈ S − {v}|x ≥ v}.
-4. Return {quicksort(S1) followed by v followed by quicksort(S2)}.
+---
 
-7.7.1 Picking the Pivot
-Although the algorithm as described works no matter which element is chosen as pivot,
-some choices are obviously better than others.
+## Insertion Sort
 
-A safe course is merely to choose the pivot randomly.
+### Algorithm Overview
+Insertion sort is one of the simplest sorting algorithms, consisting of N-1 passes. For each pass p (from 1 to N-1), it ensures elements in positions 0 through p are in sorted order.
 
-Median-of-Three Partitioning
-The median of a group of N numbers is the  N/2 th largest number. The best choice
-of pivot would be the median of the array. Unfortunately, this is hard to calculate and
-would slow down quicksort considerably. A good estimate can be obtained by picking
-three elements randomly and using the median of these three as pivot. The randomness
-turns out not to help much, so the common course is to use as pivot the median of the
-left, right, and center elements. For instance, with input 8, 1, 4, 9, 6, 3, 5, 2, 7, 0 as before,
-the left element is 8, the right element is 0, and the center (in position  (left + right)/2 )
-element is 6. Thus, the pivot would be v = 6. Using median-of-three partitioning clearly
-eliminates the bad case for sorted input (the partitions become equal in this case) and
-actually reduces the number of comparisons by 14%.
+### How It Works
+- **Strategy**: Move the element in position p left until its correct place is found among the first p+1 elements
+- **Implementation**: Uses a temporary variable to avoid explicit swaps
+- **Key Insight**: Leverages the fact that elements in positions 0 through p-1 are already sorted
 
-7.7.2 Partitioning Strategy
-There are several partitioning strategies used in practice, but the one described here is
-known to give good results. It is very easy, as we shall see, to do this wrong or inefficiently,
-but it is safe to use a known method. The first step is to get the pivot element out of
-the way by swapping it with the last element. i starts at the first element and j starts at
-the next-to-last element. If the original input was the same as before, the following figure
-shows the current situation:
-8 1 4 9 0 3 5 2 7 6
-↑ ↑
-i j
-For now, we will assume that all the elements are distinct. Later on, we will worry about
-what to do in the presence of duplicates. As a limiting case, our algorithm must do the
-proper thing if all of the elements are identical. It is surprising how easy it is to do the
-wrong thing.
+### Time Complexity Analysis
+- **Worst Case**: O(N²) - occurs with reverse-sorted input
+- **Best Case**: O(N) - occurs with already sorted input
+- **Average Case**: Θ(N²)
+- **Space Complexity**: O(1) - in-place sorting
 
-The text discusses a critical implementation detail: what should happen when elements equal to the pivot are encountered during partitioning? There are four possible strategies:
+### Performance Characteristics
+- **When to Use**: Excellent for small datasets or nearly sorted arrays
+- **Advantage**: Linear time performance on nearly sorted data
+- **Connection to Inversions**: Running time is O(I + N) where I is the number of inversions
 
-Both i and j stop when they encounter elements equal to the pivot
-i stops but j doesn't stop
-j stops but i doesn't stop
-Neither i nor j stops
+### STL Implementation Considerations
+- Uses iterators instead of array indexing
+- Requires `decltype` for template type deduction in C++11
+- Function objects for custom comparison operations
 
-The key insights:
+---
 
-Bias concern: If i and j behave differently (options 2 or 3), all elements equal to the pivot will end up in one partition, creating imbalance.
-All-identical elements case: This is used as a test case to evaluate strategies:
+## Mergesort
 
-If both pointers stop (option 1): Many seemingly "useless" swaps occur between identical elements, but this actually creates balanced partitions with sizes roughly N/2 each, giving O(N log N) performance.
-If neither pointer stops (option 4): No swaps occur, which seems efficient, but the pivot ends up near the end, creating extremely unbalanced partitions (one tiny, one huge). This leads to O(N²) performance - just as bad as using the first element as pivot on sorted data.
+### Algorithm Overview
+Mergesort is a divide-and-conquer algorithm that guarantees O(N log N) worst-case performance with nearly optimal number of comparisons.
 
+### How It Works
+1. **Divide**: Split array into two halves
+2. **Conquer**: Recursively sort each half
+3. **Combine**: Merge the two sorted halves
 
-Conclusion: It's better to do "unnecessary" swaps and get balanced partitions than to risk unbalanced partitions. Therefore, the best strategy is option 1: both i and j should stop when they encounter elements equal to the pivot.
-Practical importance: This matters because even if your original input doesn't have many duplicates, recursive calls within quicksort may eventually work on subarrays with many identical elements.
+### Recurrence Relation
+```
+T(1) = 1
+T(N) = 2T(N/2) + N
+```
 
-This is a classic example of how subtle implementation decisions can dramatically affect algorithm performance in practice, even when the theoretical complexity remains O(N log N) for the best case.
+### Time Complexity Analysis
+- **All Cases**: Θ(N log N) - consistent performance regardless of input
+- **Space Complexity**: O(N) - requires temporary array for merging
 
-7.7.6 A Linear-Expected-Time Algorithm for Selection
-Quicksort can be modified to solve the selection problem, which we have seen in Chapters 1
-and 6. Recall that by using a priority queue, we can find the kth largest (or smallest) element
-in O(N + k logN). For the special case of finding the median, this gives an O(N logN)
-algorithm.
-Since we can sort the array in O(N logN) time, one might expect to obtain a better
-time bound for selection. The algorithm we present to find the kth smallest element in a
-set S is almost identical to quicksort. In fact, the first three steps are the same. We will
-call this algorithm quickselect. Let |Si| denote the number of elements in Si. The steps of
-quickselect are
-1. If |S| = 1, then k = 1 and return the element in S as the answer. If a cutoff for small
-arrays is being used and |S| ≤ CUTOFF, then sort S and return the kth smallest element.
-2. Pick a pivot element, v ∈ S.
-3. Partition S − {v} into S1 and S2, as was done with quicksort.
-4. If k ≤ |S1|, then the kth smallest element must be in S1. In this case, return
-quickselect(S1, k). If k = 1 + |S1|, then the pivot is the kth smallest element and
-we can return it as the answer. Otherwise, the kth smallest element lies in S2, and it
-is the (k − |S1| − 1)st smallest element in S2. We make a recursive call and return
-quickselect(S2, k − |S1| − 1).
-In contrast to quicksort, quickselect makes only one recursive call instead of two. The
-worst case of quickselect is identical to that of quicksort and is O(N2). Intuitively,
+### Key Advantages
+- **Stable**: Maintains relative order of equal elements
+- **Predictable**: Consistent performance across all input types
+- **Optimal Comparisons**: Uses nearly the minimum number of comparisons possible
 
+### Implementation Notes
+- Uses a temporary array that can be reused across recursive calls
+- The merge operation is the fundamental building block
+- Excellent for external sorting (large datasets that don't fit in memory)
 
-7.6 Mergesort
-We now turn our attention to mergesort. Mergesort runs in O(N logN) worst-case running
-time, and the number of comparisons used is nearly optimal. It is a fine example of a
-recursive algorithm.
-The fundamental operation in this algorithm is merging two sorted lists.
+---
+
+## Quicksort
+
+### Algorithm Overview
+Historically the fastest generic sorting algorithm in practice with average O(N log N) performance, though it has O(N²) worst-case behavior.
+
+### Core Algorithm Steps
+1. **Base Case**: If array has 0 or 1 elements, return
+2. **Choose Pivot**: Select any element v as the pivot
+3. **Partition**: Split remaining elements into:
+   - S₁ = {x | x ≤ v}
+   - S₂ = {x | x ≥ v}
+4. **Recurse**: Return quicksort(S₁) + v + quicksort(S₂)
+
+### Pivot Selection Strategies
+
+#### Random Pivot
+- **Safety**: Eliminates worst-case scenarios in practice
+- **Performance**: Makes O(N²) behavior exponentially unlikely
+
+#### Median-of-Three Partitioning
+- **Method**: Use median of left, right, and center elements
+- **Benefits**: 
+  - Eliminates worst case for sorted input
+  - Reduces comparisons by 14%
+  - More predictable than random selection
+
+### Critical Partitioning Implementation
+
+#### The Duplicate Elements Problem
+When partitioning, there are four strategies for handling elements equal to the pivot:
+
+1. **Both pointers stop** ✅ **RECOMMENDED**
+2. **Only i stops**
+3. **Only j stops** 
+4. **Neither pointer stops**
+
+#### Why Strategy 1 is Optimal
+- **Balanced Partitions**: Creates roughly equal-sized partitions
+- **Handles Duplicates**: Critical for arrays with many identical elements
+- **Performance**: Maintains O(N log N) even with all identical elements
+- **Trade-off**: Performs "unnecessary" swaps but ensures balance
+
+#### The All-Identical Test Case
+This reveals why the implementation choice matters:
+- **Strategy 1**: Many swaps, but balanced partitions → O(N log N)
+- **Strategy 4**: No swaps, but extremely unbalanced partitions → O(N²)
+
+### Time Complexity
+- **Average Case**: O(N log N)
+- **Best Case**: O(N log N)
+- **Worst Case**: O(N²) - can be made exponentially unlikely
+- **Space Complexity**: O(log N) average (recursion stack)
+
+### When to Use Quicksort
+- **Best for**: General-purpose sorting with good average performance
+- **Advantages**: Very tight inner loop, cache-friendly
+- **Considerations**: Not stable, worst-case can be problematic
+
+---
+
+## Quickselect
+
+### Algorithm Overview
+A modification of quicksort that finds the kth smallest element in expected linear time.
+
+### Key Differences from Quicksort
+- **Single Recursion**: Makes only one recursive call instead of two
+- **Targeted Search**: Only recurses on the partition containing the target element
+
+### Algorithm Steps
+1. **Base Case**: If |S| = 1, return the element
+2. **Choose Pivot**: Select pivot element v
+3. **Partition**: Split into S₁ and S₂ as in quicksort
+4. **Selective Recursion**:
+   - If k ≤ |S₁|: recurse on S₁
+   - If k = 1 + |S₁|: pivot is the answer
+   - Otherwise: recurse on S₂ for (k - |S₁| - 1)st element
+
+### Time Complexity
+- **Average Case**: O(N) - linear expected time
+- **Worst Case**: O(N²) - same as quicksort
+- **Space Complexity**: O(log N) average
+
+### Applications
+- Finding medians in linear time
+- Order statistics problems
+- Top-k problems with better performance than sorting
+
+---
+
+## Theoretical Foundations
+
+### Inversions and Sorting
+**Definition**: An inversion is an ordered pair (i,j) where i < j but a[i] > a[j]
+
+**Key Theorems**:
+
+#### Theorem 7.1: Average Inversions
+The average number of inversions in an array of N distinct elements is N(N-1)/4.
+
+**Proof Insight**: Consider any array and its reverse - exactly one contains each possible inversion.
+
+#### Theorem 7.2: Lower Bound for Adjacent Swaps
+Any algorithm that sorts by exchanging only adjacent elements requires Ω(N²) time.
+
+### Practical Implications
+- **Insertion Sort Performance**: O(I + N) where I = number of inversions
+- **Nearly Sorted Data**: Insertion sort becomes linear for small numbers of inversions
+- **Algorithm Selection**: Understanding inversions helps choose appropriate algorithms
+
+### Comparison Summary
+
+| Algorithm | Best Case | Average Case | Worst Case | Space | Stable | Notes |
+|-----------|-----------|--------------|------------|-------|--------|-------|
+| Insertion Sort | O(N) | Θ(N²) | O(N²) | O(1) | Yes | Great for small/nearly sorted |
+| Mergesort | Θ(N log N) | Θ(N log N) | Θ(N log N) | O(N) | Yes | Consistent performance |
+| Quicksort | O(N log N) | O(N log N) | O(N²) | O(log N) | No | Fastest in practice |
+| Quickselect | O(N) | O(N) | O(N²) | O(log N) | N/A | Selection only |
+
+### Algorithm Selection Guidelines
+
+**Use Insertion Sort when**:
+- Small datasets (< 50 elements)
+- Nearly sorted data
+- Stability is required and simplicity is valued
+
+**Use Mergesort when**:
+- Guaranteed O(N log N) performance is needed
+- Stability is required
+- Working with linked lists
+- External sorting scenarios
+
+**Use Quicksort when**:
+- General-purpose sorting with best average performance
+- Memory usage should be minimized
+- Stability is not required
+
+**Use Quickselect when**:
+- Only need the kth smallest element
+- Don't need the entire array sorted
+- Linear expected time is acceptable
