@@ -409,4 +409,4 @@ int balanceFactor(Node* node) {
 
 ---
 
-*This guide covers all essential AVL tree concepts for your exam. Practice drawing rotations and calculating balance factors until they become second nature!*
+*This guide covers all essential AVL tree concepts for your exam. Practice drawing rotations and calculating balance factors until they become second nature!* 
