@@ -2,8 +2,8 @@
 Unit 7 - Session 1 - Advanced v1
 Recursion Problems for Interview Prep
 
-This file contains 6 recursion problems with complete implementations,
-complexity analysis, and comprehensive test cases.
+This file contains 6 recursion problems for you to implement.
+Each problem includes the problem statement, function signature, and test cases.
 """
 
 # ========================================
@@ -12,32 +12,25 @@ complexity analysis, and comprehensive test cases.
 
 def count_layers(sandwich):
     """
-    Recursively count the layers of a sandwich represented by nested lists.
+    Problem 1: Counting the Layers of a Sandwich
     
-    Time Complexity: O(n) where n is the total number of elements in the sandwich
-    Space Complexity: O(d) where d is the maximum depth of nesting (recursion stack)
+    You're working at a deli, and need to count the layers of a sandwich to make sure 
+    you made the order correctly. Each layer is represented by a nested list. Given a 
+    list of lists sandwich where each list [] represents a sandwich layer, write a 
+    recursive function count_layers() that returns the total number of sandwich layers.
     
-    Variables:
-    - n: total number of elements in the sandwich structure
-    - d: maximum depth of nesting in the sandwich structure
+    Evaluate the time and space complexity of your solution. Define your variables and 
+    provide a rationale for why you believe your solution has the stated time and space complexity.
     
-    Rationale:
-    - We visit each element exactly once during recursion
-    - Space complexity is determined by the recursion stack depth
+    Example Usage:
+    sandwich1 = ["bread", ["lettuce", ["tomato", ["bread"]]]]
+    sandwich2 = ["bread", ["cheese", ["ham", ["mustard", ["bread"]]]]]
+    
+    print(count_layers(sandwich1))  # Expected: 4
+    print(count_layers(sandwich2))  # Expected: 5
     """
-    if not sandwich:
-        return 0
-    
-    # Base case: if it's a string (actual layer), count it
-    if isinstance(sandwich, str):
-        return 1
-    
-    # Recursive case: sum up layers from all nested lists
-    total_layers = 0
-    for layer in sandwich:
-        total_layers += count_layers(layer)
-    
-    return total_layers
+    # TODO: Implement your solution here
+    pass
 
 
 # ========================================
@@ -46,38 +39,22 @@ def count_layers(sandwich):
 
 def reverse_orders(orders):
     """
-    Recursively reverse the order of deli orders separated by spaces.
+    Problem 2: Reversing Deli Orders
     
-    Time Complexity: O(n) where n is the length of the orders string
-    Space Complexity: O(n) for the recursion stack and string operations
+    The deli counter is busy, and orders have piled up. To serve the last customer first, 
+    you need to reverse the order of the deli orders. Given a string orders where each 
+    individual order is separated by a single space, write a recursive function 
+    reverse_orders() that returns a new string with the orders reversed.
     
-    Variables:
-    - n: length of the orders string
+    Evaluate the time and space complexity of your solution. Define your variables and 
+    provide a rationale for why you believe your solution has the stated time and space complexity.
     
-    Rationale:
-    - We process each character once during recursion
-    - Space is used for recursion stack and string concatenation
+    Example Usage:
+    print(reverse_orders("Bagel Sandwich Coffee"))
+    # Expected Output: "Coffee Sandwich Bagel"
     """
-    if not orders:
-        return ""
-    
-    # Find the first space
-    space_index = orders.find(' ')
-    
-    # Base case: no space found (single word)
-    if space_index == -1:
-        return orders
-    
-    # Recursive case: reverse the rest and append the first word
-    first_word = orders[:space_index]
-    remaining_orders = orders[space_index + 1:]
-    
-    reversed_remaining = reverse_orders(remaining_orders)
-    
-    if reversed_remaining:
-        return reversed_remaining + " " + first_word
-    else:
-        return first_word
+    # TODO: Implement your solution here
+    pass
 
 
 # ========================================
@@ -86,68 +63,28 @@ def reverse_orders(orders):
 
 def can_split_coffee(coffee, n):
     """
-    Recursively determine if coffee can be split evenly among n staff.
+    Problem 3: Sharing the Coffee
     
-    Time Complexity: O(2^n) in worst case due to exponential recursive calls
-    Space Complexity: O(n) for the recursion stack
+    The deli staff is in desperate need of caffeine to keep them going through their shift 
+    and has decided to divide the coffee supply equally among themselves. Each batch of 
+    coffee is stored in containers of different sizes. Write a recursive function 
+    can_split_coffee() that accepts a list of integers coffee representing the volume of 
+    each batch of coffee and returns True if the coffee can be split evenly by volume 
+    among n staff and False otherwise.
     
-    Variables:
-    - n: number of staff members
-    - m: number of coffee containers
+    Evaluate the time and space complexity of your solution. Define your variables and 
+    provide a rationale for why you believe your solution has the stated time and space complexity.
     
-    Rationale:
-    - Each recursive call can branch into multiple possibilities
-    - Space is bounded by the recursion stack depth
+    Example Usage:
+    print(can_split_coffee([4, 4, 8], 2))    # Expected: True
+    print(can_split_coffee([5, 10, 15], 4))  # Expected: False
     """
-    if not coffee:
-        return n == 0
-    
-    if n == 0:
-        return not coffee
-    
-    total_volume = sum(coffee)
-    target_per_person = total_volume / n
-    
-    # If total volume can't be divided evenly, return False
-    if total_volume % n != 0:
-        return False
-    
-    return _can_split_helper(coffee, n, target_per_person, 0, [0] * n)
-
-
-def _can_split_helper(coffee, n, target, coffee_index, current_splits):
-    """
-    Helper function for recursive coffee splitting.
-    
-    Args:
-        coffee: list of coffee volumes
-        n: number of staff
-        target: target volume per person
-        coffee_index: current coffee container index
-        current_splits: current volume assigned to each person
-    """
-    # Base case: all coffee containers processed
-    if coffee_index >= len(coffee):
-        return all(split == target for split in current_splits)
-    
-    current_volume = coffee[coffee_index]
-    
-    # Try assigning current volume to each person
-    for person in range(n):
-        if current_splits[person] + current_volume <= target:
-            current_splits[person] += current_volume
-            
-            if _can_split_helper(coffee, n, target, coffee_index + 1, current_splits):
-                return True
-            
-            # Backtrack
-            current_splits[person] -= current_volume
-    
-    return False
+    # TODO: Implement your solution here
+    pass
 
 
 # ========================================
-# PROBLEM 4: SUPER SANDWICH (RECURSIVE)
+# PROBLEM 4: SUPER SANDWICH
 # ========================================
 
 class Node:
@@ -166,36 +103,33 @@ def print_linked_list(head):
 
 def merge_orders(sandwich_a, sandwich_b):
     """
-    Recursively merge two linked list sandwiches in alternating pattern.
+    Problem 4: Super Sandwich
     
-    Time Complexity: O(min(m, n)) where m and n are lengths of the lists
-    Space Complexity: O(min(m, n)) for the recursion stack
+    A regular at the deli has requested a new order made by merging two different 
+    sandwiches on the menu together. Given the heads of two linked lists sandwich_a 
+    and sandwich_b where each node in the lists contains a spell segment, write a 
+    recursive function merge_orders() that merges the two sandwiches together in the pattern:
     
-    Variables:
-    - m: length of sandwich_a
-    - n: length of sandwich_b
+    a1 -> b1 -> a2 -> b2 -> a3 -> b3 -> ...
     
-    Rationale:
-    - We process each node once during recursion
-    - Space is bounded by the recursion stack depth
+    Return the head of the merged sandwich.
+    
+    Evaluate the time and space complexity of your solution. Define your variables and 
+    provide a rationale for why you believe your solution has the stated time and space complexity.
+    
+    Example Usage:
+    sandwich_a = Node('Bacon', Node('Lettuce', Node('Tomato')))
+    sandwich_b = Node('Turkey', Node('Cheese', Node('Mayo')))
+    sandwich_c = Node('Bread')
+    
+    print_linked_list(merge_orders(sandwich_a, sandwich_b))
+    # Expected: Bacon -> Turkey -> Lettuce -> Cheese -> Tomato -> Mayo
+    
+    print_linked_list(merge_orders(sandwich_a, sandwich_c))
+    # Expected: Bacon -> Bread -> Lettuce -> Tomato
     """
-    # Base cases: if either list is empty, return the other
-    if not sandwich_a:
-        return sandwich_b
-    if not sandwich_b:
-        return sandwich_a
-    
-    # Store next pointers
-    next_a = sandwich_a.next
-    next_b = sandwich_b.next
-    
-    # Link current nodes
-    sandwich_a.next = sandwich_b
-    
-    # Recursively merge the remaining parts
-    sandwich_b.next = merge_orders(next_a, next_b)
-    
-    return sandwich_a
+    # TODO: Implement your solution here
+    pass
 
 
 # ========================================
@@ -204,7 +138,13 @@ def merge_orders(sandwich_a, sandwich_b):
 
 def merge_orders_iterative(sandwich_a, sandwich_b):
     """
-    Iterative solution to merge two linked list sandwiches.
+    Problem 5: Super Sandwich II (Iterative)
+    
+    Below is an iterative solution to the merge_orders() function from the previous problem. 
+    Compare your recursive solution to the iterative solution below.
+    
+    Discuss with your podmates. Which solution do you prefer? How do they compare on 
+    time complexity? Space complexity?
     
     Time Complexity: O(min(m, n)) where m and n are lengths of the lists
     Space Complexity: O(1) - only uses a constant amount of extra space
@@ -248,64 +188,42 @@ def merge_orders_iterative(sandwich_a, sandwich_b):
 
 
 # ========================================
-# PROBLEM 6: TERNARY EXPRESSION (RECURSIVE)
+# PROBLEM 6: TERNARY EXPRESSION
 # ========================================
 
 def evaluate_ternary_expression_recursive(expression):
     """
-    Recursively evaluate a ternary expression.
+    Problem 6: Ternary Expression
     
-    Time Complexity: O(n) where n is the length of the expression
-    Space Complexity: O(n) for the recursion stack
+    Given a string expression representing arbitrarily nested ternary expressions, 
+    evaluate the expression, and return its result as a string.
     
-    Variables:
-    - n: length of the expression string
+    You can always assume that the given expression is valid and only contains digits, 
+    '?', ':', 'T', and 'F' where 'T' is True and 'F' is False. All the numbers in 
+    the expression are one-digit numbers (i.e., in the range [0, 9]).
     
-    Rationale:
-    - We process each character once during recursion
-    - Space is bounded by the recursion stack depth
+    Ternary expressions use the following syntax:
+    condition ? true_choice : false_choice
+    
+    - condition is evaluate first and determines which choice to make
+    - true_choice is taken if condition evaluates to True
+    - false_choice is taken if condition evaluates to False
+    - The conditional expressions group right-to-left, and the result of the expression 
+      will always evaluate to either a digit, 'T' or 'F'.
+    
+    We have provided an iterative solution that uses an explicit stack. Implement a 
+    recursive solution evaluate_ternary_expression_recursive().
+    
+    Evaluate the time and space complexity of your solution. Define your variables and 
+    provide a rationale for why you believe your solution has the stated time and space complexity.
+    
+    Example Usage:
+    print(evaluate_ternary_expression_recursive("T?2:3"))        # Expected: "2"
+    print(evaluate_ternary_expression_recursive("F?1:T?4:5"))   # Expected: "4"
+    print(evaluate_ternary_expression_recursive("T?T?F:5:3"))   # Expected: "F"
     """
-    if not expression:
-        return ""
-    
-    # Find the first '?' to identify the condition
-    question_mark = expression.find('?')
-    if question_mark == -1:
-        return expression
-    
-    # Extract condition (everything before '?')
-    condition = expression[:question_mark]
-    
-    # Find the corresponding ':' for this '?'
-    colon_index = _find_matching_colon(expression, question_mark)
-    if colon_index == -1:
-        return expression
-    
-    # Extract true and false expressions
-    true_expr = expression[question_mark + 1:colon_index]
-    false_expr = expression[colon_index + 1:]
-    
-    # Evaluate based on condition
-    if condition == 'T':
-        return evaluate_ternary_expression_recursive(true_expr)
-    else:  # condition == 'F'
-        return evaluate_ternary_expression_recursive(false_expr)
-
-
-def _find_matching_colon(expression, question_mark):
-    """
-    Find the colon that matches the question mark at question_mark.
-    Handles nested ternary expressions correctly.
-    """
-    count = 0
-    for i in range(question_mark, len(expression)):
-        if expression[i] == '?':
-            count += 1
-        elif expression[i] == ':':
-            count -= 1
-            if count == 0:
-                return i
-    return -1
+    # TODO: Implement your solution here
+    pass
 
 
 def evaluate_ternary_expression_iterative(expression):

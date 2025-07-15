@@ -1,4 +1,4 @@
-# Unit 7 - Session 1 - Advanced v1: Recursion Problems
+# Unit 7 - Session 1 - Advanced v1: Recursion Practice Problems
 
 ## 📚 Learning Objectives
 
@@ -12,7 +12,13 @@ By the end of this session, you should be able to:
 
 ## 🎯 Problem Overview
 
-This session contains 6 advanced recursion problems that test different aspects of recursive thinking:
+This session contains 6 advanced recursion problems for you to implement. Each problem includes:
+- Complete problem statement with examples
+- Function signature and expected behavior
+- Test cases to verify your implementation
+- Complexity analysis requirements
+
+**Note: These are practice problems - you need to implement the solutions yourself!**
 
 ### Problem 1: Counting the Layers of a Sandwich
 - **Focus**: Nested data structure traversal
