@@ -19,7 +19,11 @@ def count_suits_iterative(suits):
     count_suits_iterative(["Mark I", "Mark II", "Mark III"]) → 3
     """
     # TODO: Implement your solution here
-    pass
+
+    count = 0 
+    for suit in suits:
+        count += 1
+    return count
 
 
 def count_suits_recursive(suits):
@@ -30,8 +34,9 @@ def count_suits_recursive(suits):
     count_suits_recursive(["Mark I", "Mark I", "Mark III", "Mark IV"]) → 4
     """
     # TODO: Implement your solution here
-    pass
-
+    if not suits:
+        return 0
+    return 1 + count_suits_recursive(suits[1])
 
 # ========================================
 # PROBLEM 2: COLLECTING INFINITY STONES
@@ -46,7 +51,14 @@ def sum_stones(stones):
     sum_stones([12, 8, 22, 16, 10]) → 68
     """
     # TODO: Implement your solution here
-    pass
+    # count = 0 
+    # for stone in stones:
+    #     count += stone
+    # return count
+
+    if not stones: 
+        return 0 
+    return stones[0] + sum_stones(stones[1:])
 
 
 # ========================================

@@ -12,22 +12,16 @@ Each problem includes the problem statement, function signature, and test cases.
 
 def count_layers(sandwich):
     """
-    Problem 1: Counting the Layers of a Sandwich
+    Count the total number of layers in a sandwich represented by nested lists.
     
-    You're working at a deli, and need to count the layers of a sandwich to make sure 
-    you made the order correctly. Each layer is represented by a nested list. Given a 
-    list of lists sandwich where each list [] represents a sandwich layer, write a 
-    recursive function count_layers() that returns the total number of sandwich layers.
+    Each string represents one layer. Count all strings in the nested structure.
     
-    Evaluate the time and space complexity of your solution. Define your variables and 
-    provide a rationale for why you believe your solution has the stated time and space complexity.
-    
-    Example Usage:
+    Example:
     sandwich1 = ["bread", ["lettuce", ["tomato", ["bread"]]]]
-    sandwich2 = ["bread", ["cheese", ["ham", ["mustard", ["bread"]]]]]
+    count_layers(sandwich1) → 4
     
-    print(count_layers(sandwich1))  # Expected: 4
-    print(count_layers(sandwich2))  # Expected: 5
+    sandwich2 = ["bread", ["cheese", ["ham", ["mustard", ["bread"]]]]]
+    count_layers(sandwich2) → 5
     """
     # TODO: Implement your solution here
     pass
@@ -39,19 +33,10 @@ def count_layers(sandwich):
 
 def reverse_orders(orders):
     """
-    Problem 2: Reversing Deli Orders
+    Reverse the order of words in a string separated by spaces.
     
-    The deli counter is busy, and orders have piled up. To serve the last customer first, 
-    you need to reverse the order of the deli orders. Given a string orders where each 
-    individual order is separated by a single space, write a recursive function 
-    reverse_orders() that returns a new string with the orders reversed.
-    
-    Evaluate the time and space complexity of your solution. Define your variables and 
-    provide a rationale for why you believe your solution has the stated time and space complexity.
-    
-    Example Usage:
-    print(reverse_orders("Bagel Sandwich Coffee"))
-    # Expected Output: "Coffee Sandwich Bagel"
+    Example:
+    reverse_orders("Bagel Sandwich Coffee") → "Coffee Sandwich Bagel"
     """
     # TODO: Implement your solution here
     pass
@@ -63,21 +48,11 @@ def reverse_orders(orders):
 
 def can_split_coffee(coffee, n):
     """
-    Problem 3: Sharing the Coffee
+    Check if coffee volumes can be split evenly among n people.
     
-    The deli staff is in desperate need of caffeine to keep them going through their shift 
-    and has decided to divide the coffee supply equally among themselves. Each batch of 
-    coffee is stored in containers of different sizes. Write a recursive function 
-    can_split_coffee() that accepts a list of integers coffee representing the volume of 
-    each batch of coffee and returns True if the coffee can be split evenly by volume 
-    among n staff and False otherwise.
-    
-    Evaluate the time and space complexity of your solution. Define your variables and 
-    provide a rationale for why you believe your solution has the stated time and space complexity.
-    
-    Example Usage:
-    print(can_split_coffee([4, 4, 8], 2))    # Expected: True
-    print(can_split_coffee([5, 10, 15], 4))  # Expected: False
+    Example:
+    can_split_coffee([4, 4, 8], 2) → True   (4+4+8=16, 16/2=8 each)
+    can_split_coffee([5, 10, 15], 4) → False (5+10+15=30, 30/4=7.5 not even)
     """
     # TODO: Implement your solution here
     pass
@@ -103,30 +78,12 @@ def print_linked_list(head):
 
 def merge_orders(sandwich_a, sandwich_b):
     """
-    Problem 4: Super Sandwich
+    Merge two linked lists in alternating pattern: a1->b1->a2->b2->...
     
-    A regular at the deli has requested a new order made by merging two different 
-    sandwiches on the menu together. Given the heads of two linked lists sandwich_a 
-    and sandwich_b where each node in the lists contains a spell segment, write a 
-    recursive function merge_orders() that merges the two sandwiches together in the pattern:
-    
-    a1 -> b1 -> a2 -> b2 -> a3 -> b3 -> ...
-    
-    Return the head of the merged sandwich.
-    
-    Evaluate the time and space complexity of your solution. Define your variables and 
-    provide a rationale for why you believe your solution has the stated time and space complexity.
-    
-    Example Usage:
-    sandwich_a = Node('Bacon', Node('Lettuce', Node('Tomato')))
-    sandwich_b = Node('Turkey', Node('Cheese', Node('Mayo')))
-    sandwich_c = Node('Bread')
-    
-    print_linked_list(merge_orders(sandwich_a, sandwich_b))
-    # Expected: Bacon -> Turkey -> Lettuce -> Cheese -> Tomato -> Mayo
-    
-    print_linked_list(merge_orders(sandwich_a, sandwich_c))
-    # Expected: Bacon -> Bread -> Lettuce -> Tomato
+    Example:
+    a = Bacon->Lettuce->Tomato
+    b = Turkey->Cheese->Mayo
+    merge_orders(a, b) → Bacon->Turkey->Lettuce->Cheese->Tomato->Mayo
     """
     # TODO: Implement your solution here
     pass
@@ -138,24 +95,12 @@ def merge_orders(sandwich_a, sandwich_b):
 
 def merge_orders_iterative(sandwich_a, sandwich_b):
     """
-    Problem 5: Super Sandwich II (Iterative)
+    Iterative version of merge_orders for comparison.
     
-    Below is an iterative solution to the merge_orders() function from the previous problem. 
-    Compare your recursive solution to the iterative solution below.
-    
-    Discuss with your podmates. Which solution do you prefer? How do they compare on 
-    time complexity? Space complexity?
-    
-    Time Complexity: O(min(m, n)) where m and n are lengths of the lists
-    Space Complexity: O(1) - only uses a constant amount of extra space
-    
-    Variables:
-    - m: length of sandwich_a
-    - n: length of sandwich_b
-    
-    Rationale:
-    - We visit each node once during iteration
-    - Space is constant as we only use a few variables
+    Compare this with your recursive solution:
+    - Which is easier to understand?
+    - Which uses less space?
+    - Which would you prefer in an interview?
     """
     # If either list is empty, return the other
     if not sandwich_a:
@@ -193,34 +138,17 @@ def merge_orders_iterative(sandwich_a, sandwich_b):
 
 def evaluate_ternary_expression_recursive(expression):
     """
-    Problem 6: Ternary Expression
+    Evaluate a ternary expression: condition ? true_value : false_value
     
-    Given a string expression representing arbitrarily nested ternary expressions, 
-    evaluate the expression, and return its result as a string.
+    Rules:
+    - 'T' = True, 'F' = False
+    - Numbers are single digits 0-9
+    - Expressions group right-to-left
     
-    You can always assume that the given expression is valid and only contains digits, 
-    '?', ':', 'T', and 'F' where 'T' is True and 'F' is False. All the numbers in 
-    the expression are one-digit numbers (i.e., in the range [0, 9]).
-    
-    Ternary expressions use the following syntax:
-    condition ? true_choice : false_choice
-    
-    - condition is evaluate first and determines which choice to make
-    - true_choice is taken if condition evaluates to True
-    - false_choice is taken if condition evaluates to False
-    - The conditional expressions group right-to-left, and the result of the expression 
-      will always evaluate to either a digit, 'T' or 'F'.
-    
-    We have provided an iterative solution that uses an explicit stack. Implement a 
-    recursive solution evaluate_ternary_expression_recursive().
-    
-    Evaluate the time and space complexity of your solution. Define your variables and 
-    provide a rationale for why you believe your solution has the stated time and space complexity.
-    
-    Example Usage:
-    print(evaluate_ternary_expression_recursive("T?2:3"))        # Expected: "2"
-    print(evaluate_ternary_expression_recursive("F?1:T?4:5"))   # Expected: "4"
-    print(evaluate_ternary_expression_recursive("T?T?F:5:3"))   # Expected: "F"
+    Examples:
+    "T?2:3" → "2"        (True, so take 2)
+    "F?1:T?4:5" → "4"    (False, so take T?4:5, which is True, so take 4)
+    "T?T?F:5:3" → "F"    (True, so take T?F:5, which is True, so take F)
     """
     # TODO: Implement your solution here
     pass
