@@ -1,4 +1,4 @@
-# Unit [X] - My Notes
+# Unit 6 - My Notes
 
 ## Session 1 Notes
 
